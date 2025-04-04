@@ -24,6 +24,7 @@ export default function RootLayout({
       ssr: false,
     }
   );
+
   return (
     <html lang="en">
       <body className={inter.className}>

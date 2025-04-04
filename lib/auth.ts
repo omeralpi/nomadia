@@ -46,6 +46,7 @@ export const authOptions: NextAuthOptions = {
             if (user) {
                 token.id = user.id;
                 token.name = user.name;
+                token.image = user.image;
             }
 
             if (trigger === "update" || !token.name) {
@@ -56,6 +57,7 @@ export const authOptions: NextAuthOptions = {
                 if (dbUser) {
                     token.name = dbUser.name;
                     token.bio = dbUser.bio ?? undefined;
+                    token.image = dbUser.image ?? undefined;
                 }
             }
 
@@ -70,6 +72,7 @@ export const authOptions: NextAuthOptions = {
             session.user.id = token.id as string;
             session.user.name = token.name as string;
             session.user.bio = token.bio;
+            session.user.image = token.image as string | null;
 
             return session;
         },

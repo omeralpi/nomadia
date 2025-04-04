@@ -1,0 +1,98 @@
+"use client";
+
+import { AvatarUpload } from "@/components/avatar-upload";
+import { Button } from "@/components/ui/button";
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
+
+const profileSchema = z.object({
+    name: z.string().min(1, "Name is required"),
+    bio: z.string().optional(),
+    image: z.string().optional(),
+});
+
+export type ProfileFormData = z.infer<typeof profileSchema>;
+
+interface ProfileFormProps {
+    defaultValues: ProfileFormData;
+    onSubmit: (data: ProfileFormData) => Promise<void>;
+    isSubmitting?: boolean;
+}
+
+export function ProfileForm({ defaultValues, onSubmit, isSubmitting }: ProfileFormProps) {
+    const form = useForm<ProfileFormData>({
+        resolver: zodResolver(profileSchema),
+        defaultValues,
+    });
+
+    const handleAvatarUpload = (url: string) => {
+        form.setValue("image", url);
+    };
+
+    return (
+        <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <div className="flex flex-col items-center space-y-4">
+                    <AvatarUpload
+                        currentImage={form.watch("image")}
+                        fallback={form.watch("name")?.[0]}
+                        onUploadSuccess={handleAvatarUpload}
+                        onUploadError={(error) => toast.error(error.message)}
+                        size="md"
+                    />
+                </div>
+
+                <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Name</FormLabel>
+                            <FormControl>
+                                <Input placeholder="Your name" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="bio"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Bio</FormLabel>
+                            <FormControl>
+                                <Textarea
+                                    placeholder="Tell us about yourself"
+                                    {...field}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={isSubmitting}
+                >
+                    {isSubmitting ? "Saving..." : "Save Changes"}
+                </Button>
+            </form>
+        </Form>
+    );
+} 

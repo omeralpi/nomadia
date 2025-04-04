@@ -10,6 +10,7 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
   name: text("name"),
   bio: text("bio"),
+  image: text("image"),
 })
 
 export type User = typeof users.$inferSelect
@@ -19,4 +20,5 @@ export const createUserSchema = createInsertSchema(users)
 export const updateUserSchema = createInsertSchema(users).pick({
   name: true,
   bio: true,
+  image: true,
 })

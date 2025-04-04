@@ -4,8 +4,6 @@ import { Compass, Home, LucideIcon, MessageCircle, User, Wallet } from "lucide-r
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
-import { QRSheet } from "./qr-sheet";
 
 type NavItem = {
     label: string;
@@ -17,7 +15,6 @@ type NavItem = {
 export const BottomNav = () => {
     const pathname = usePathname();
     const router = useRouter();
-    const [isQRSheetOpen, setIsQRSheetOpen] = useState(false);
     const { data: session } = useSession();
 
     const navItems: NavItem[] = [
@@ -35,10 +32,7 @@ export const BottomNav = () => {
         path: string
     ) => {
         e.preventDefault();
-        if (path === "/qr") {
-            setIsQRSheetOpen(true);
-            return;
-        }
+
         if (pathname !== path) {
             router.push(path);
         }
@@ -84,10 +78,6 @@ export const BottomNav = () => {
                 </div>
                 <div className="safe-area-spacer" />
             </nav>
-            <QRSheet
-                isOpen={isQRSheetOpen}
-                onClose={() => setIsQRSheetOpen(false)}
-            />
         </>
     );
 };

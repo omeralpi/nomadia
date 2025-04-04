@@ -1,9 +1,9 @@
 "use client";
 import {
   MiniKit,
-  tokenToDecimals,
-  Tokens,
   PayCommandInput,
+  Tokens,
+  tokenToDecimals,
 } from "@worldcoin/minikit-js";
 
 const sendPayment = async () => {

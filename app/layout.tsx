@@ -1,9 +1,9 @@
+import MiniKitProvider from "@/components/minikit-provider";
+import NextAuthProvider from "@/components/next-auth-provider";
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import MiniKitProvider from "@/components/minikit-provider";
-import dynamic from "next/dynamic";
-import NextAuthProvider from "@/components/next-auth-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 

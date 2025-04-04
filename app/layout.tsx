@@ -1,5 +1,6 @@
 import MiniKitProvider from "@/components/minikit-provider";
 import NextAuthProvider from "@/components/next-auth-provider";
+import { Toaster } from "@/components/ui/sonner";
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import { Inter } from "next/font/google";
@@ -33,6 +34,7 @@ export default function RootLayout({
             </MiniKitProvider>
           </ErudaProvider>
         </NextAuthProvider>
+        <Toaster />
       </body>
     </html>
   );

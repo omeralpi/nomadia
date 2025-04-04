@@ -43,22 +43,14 @@ export const authOptions: NextAuthOptions = {
         },
 
         jwt: async ({ token, user, trigger }) => {
-            if (user) {
-                token.id = user.id;
-                token.name = user.name;
-                token.image = user.image;
-            }
+            const dbUser = await db.query.users.findFirst({
+                where: eq(users.id, token.id as string),
+            });
 
-            if (trigger === "update" || !token.name) {
-                const dbUser = await db.query.users.findFirst({
-                    where: eq(users.id, token.id as string),
-                });
-
-                if (dbUser) {
-                    token.name = dbUser.name;
-                    token.bio = dbUser.bio ?? undefined;
-                    token.image = dbUser.image ?? undefined;
-                }
+            if (dbUser) {
+                token.name = dbUser.name;
+                token.bio = dbUser.bio ?? undefined;
+                token.image = dbUser.image ?? undefined;
             }
 
             return token;

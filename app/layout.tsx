@@ -1,12 +1,16 @@
 import MiniKitProvider from "@/components/minikit-provider";
 import NextAuthProvider from "@/components/next-auth-provider";
+import { TRPCProvider } from "@/components/trpc-provider";
 import { Toaster } from "@/components/ui/sonner";
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
-import { Inter } from "next/font/google";
+import { Noto_Sans } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const notoSans = Noto_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -27,13 +31,15 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={notoSans.className}>
         <NextAuthProvider>
-          <ErudaProvider>
-            <MiniKitProvider>
-              {children}
-            </MiniKitProvider>
-          </ErudaProvider>
+          <TRPCProvider>
+            <ErudaProvider>
+              <MiniKitProvider>
+                {children}
+              </MiniKitProvider>
+            </ErudaProvider>
+          </TRPCProvider>
         </NextAuthProvider>
         <Toaster />
       </body>

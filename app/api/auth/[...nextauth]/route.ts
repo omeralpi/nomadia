@@ -1,3 +1,5 @@
+import { db } from "@/lib/db";
+import { users } from "@/lib/db/schema";
 import NextAuth, { NextAuthOptions } from "next-auth";
 
 const authOptions: NextAuthOptions = {
@@ -26,6 +28,16 @@ const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ user }) {
+      await db
+        .insert(users)
+        .values({
+          id: user.id,
+        })
+        .onConflictDoNothing()
+        .catch((e) => {
+          console.error("error inserting player", e);
+        });
+
       return true;
     },
   },

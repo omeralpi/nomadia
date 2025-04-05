@@ -7,7 +7,6 @@ import {
     RiFileList2Line,
     RiUser3Line
 } from '@remixicon/react';
-import { useSession } from 'next-auth/react';
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -21,11 +20,10 @@ type NavItem = {
 export const BottomNav = () => {
     const pathname = usePathname();
     const router = useRouter();
-    const { data: session } = useSession();
 
     const navItems: NavItem[] = [
         {
-            label: "Earth",
+            label: "P2P",
             path: "/earth",
             icon: RiEarthLine
         },

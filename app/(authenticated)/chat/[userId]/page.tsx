@@ -13,10 +13,6 @@ export default function Page() {
 
     const { data: user, isLoading: isLoadingUser } = api.user.getById.useQuery({ id: userId });
 
-    const { data: conversation } = api.chat.getConversationByUser.useQuery({
-        userId
-    });
-
     return (
         <div className="flex h-full flex-col">
             {isLoadingUser ? (
@@ -28,9 +24,7 @@ export default function Page() {
                 />
             ) : null}
             <div className="flex-1 overflow-y-auto">
-                {conversation && (
-                    <ChatMessages conversationId={conversation.id} />
-                )}
+                <ChatMessages userId={userId} />
             </div>
             <ChatInput userId={userId} />
         </div>

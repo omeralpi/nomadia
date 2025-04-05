@@ -6,12 +6,9 @@ import { api } from "@/lib/api";
 import { formatDistanceToNow } from "date-fns";
 import { MessageCircleIcon } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
 import { EmptyState } from "../empty-state";
 
 export function ChatList() {
-    const params = useParams();
-
     const { data: conversations, isLoading } = api.chat.getConversations.useQuery();
 
     if (isLoading) {

@@ -1,6 +1,5 @@
-import { conversations, messages } from "@/lib/db/schema/chat";
-import { TRPCError } from "@trpc/server";
-import { and, desc, eq, or } from "drizzle-orm";
+import { conversationParticipants, conversations, messages } from "@/lib/db/schema/chat";
+import { and, asc, desc, eq, exists } from "drizzle-orm";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
@@ -11,19 +10,13 @@ export const chatRouter = createTRPCRouter({
         const { userId } = input;
 
         const conversation = await ctx.db.query.conversations.findFirst({
-            where: or(
-                and(
-                    eq(conversations.user1Id, userId),
-                    eq(conversations.user2Id, ctx.session.user.id)
-                ),
-                and(
-                    eq(conversations.user1Id, ctx.session.user.id),
-                    eq(conversations.user2Id, userId)
-                )
-            ),
+            where: eq(conversationParticipants.userId, userId),
             with: {
-                user1: true,
-                user2: true,
+                participants: {
+                    with: {
+                        user: true,
+                    },
+                },
             },
         });
 
@@ -32,13 +25,20 @@ export const chatRouter = createTRPCRouter({
 
     getConversations: protectedProcedure.query(async ({ ctx }) => {
         const userConversations = await ctx.db.query.conversations.findMany({
-            where: or(
-                eq(conversations.user1Id, ctx.session.user.id),
-                eq(conversations.user2Id, ctx.session.user.id)
+            where: exists(
+                ctx.db.select()
+                    .from(conversationParticipants)
+                    .where(and(
+                        eq(conversationParticipants.conversationId, conversations.id),
+                        eq(conversationParticipants.userId, ctx.session.user.id)
+                    ))
             ),
             with: {
-                user1: true,
-                user2: true,
+                participants: {
+                    with: {
+                        user: true,
+                    },
+                },
                 messages: {
                     limit: 1,
                     orderBy: [desc(messages.createdAt)],
@@ -49,42 +49,57 @@ export const chatRouter = createTRPCRouter({
 
         return userConversations.map(conv => ({
             ...conv,
-            participants: [conv.user1Id === ctx.session.user.id ? conv.user2 : conv.user1],
+            participants: conv.participants
+                .filter(p => p.userId !== ctx.session.user.id)
+                .map(p => p.user),
             lastMessage: conv.messages[0],
         }));
     }),
 
     getMessages: protectedProcedure
         .input(z.object({
-            conversationId: z.number(),
+            userId: z.string(),
             cursor: z.number().optional(),
             limit: z.number().min(1).max(100).default(50),
         }))
         .query(async ({ ctx, input }) => {
-            const { conversationId, cursor, limit } = input;
+            const { userId, cursor, limit } = input;
 
-            const conversation = await ctx.db.query.conversations.findFirst({
-                where: and(
-                    eq(conversations.id, conversationId),
-                    or(
-                        eq(conversations.user1Id, ctx.session.user.id),
-                        eq(conversations.user2Id, ctx.session.user.id)
+            const conversation = await ctx.db.select()
+                .from(conversations)
+                .innerJoin(conversationParticipants, eq(conversations.id, conversationParticipants.conversationId))
+                .where(
+                    and(
+                        eq(conversationParticipants.userId, ctx.session.user.id),
+                        exists(
+                            ctx.db.select()
+                                .from(conversationParticipants)
+                                .where(
+                                    and(
+                                        eq(conversationParticipants.conversationId, conversations.id),
+                                        eq(conversationParticipants.userId, userId)
+                                    )
+                                )
+                        )
                     )
-                ),
-            });
+                )
+                .limit(1);
 
-            if (!conversation) {
-                throw new TRPCError({ code: "FORBIDDEN" });
+            if (!conversation.length) {
+                return {
+                    items: [],
+                    nextCursor: undefined,
+                };
             }
 
             const items = await ctx.db.query.messages.findMany({
-                where: eq(messages.conversationId, conversationId),
+                where: eq(messages.conversationId, conversation[0].conversations.id),
                 with: {
                     sender: true,
                 },
                 limit: limit + 1,
                 offset: cursor,
-                orderBy: [desc(messages.createdAt)],
+                orderBy: [asc(messages.createdAt)],
             });
 
             let nextCursor: typeof cursor = undefined;
@@ -107,28 +122,62 @@ export const chatRouter = createTRPCRouter({
         .mutation(async ({ ctx, input }) => {
             const { content, userId } = input;
 
-            const existingConversation = await ctx.db.query.conversations.findFirst({
-                where: or(
+            const participantsCount = await ctx.db.select({
+                count: conversations.id
+            })
+                .from(conversations)
+                .innerJoin(conversationParticipants, eq(conversations.id, conversationParticipants.conversationId))
+                .where(
                     and(
-                        eq(conversations.user1Id, userId),
-                        eq(conversations.user2Id, ctx.session.user.id)
-                    ),
-                    and(
-                        eq(conversations.user1Id, ctx.session.user.id),
-                        eq(conversations.user2Id, userId)
+                        eq(conversationParticipants.userId, ctx.session.user.id),
+                        exists(
+                            ctx.db.select()
+                                .from(conversationParticipants)
+                                .where(
+                                    and(
+                                        eq(conversationParticipants.conversationId, conversations.id),
+                                        eq(conversationParticipants.userId, userId)
+                                    )
+                                )
+                        )
                     )
-                ),
-            });
+                );
 
             let conversationId: number;
-            if (existingConversation) {
-                conversationId = existingConversation.id;
+            if (participantsCount.length > 0) {
+                const [conversation] = await ctx.db.select()
+                    .from(conversations)
+                    .innerJoin(conversationParticipants, eq(conversations.id, conversationParticipants.conversationId))
+                    .where(
+                        and(
+                            eq(conversationParticipants.userId, ctx.session.user.id),
+                            exists(
+                                ctx.db.select()
+                                    .from(conversationParticipants)
+                                    .where(
+                                        and(
+                                            eq(conversationParticipants.conversationId, conversations.id),
+                                            eq(conversationParticipants.userId, userId)
+                                        )
+                                    )
+                            )
+                        )
+                    );
+                conversationId = conversation.conversations.id;
             } else {
-                const [newConversation] = await ctx.db.insert(conversations).values({
-                    user1Id: ctx.session.user.id,
-                    user2Id: userId,
-                }).returning();
+                const [newConversation] = await ctx.db.insert(conversations).values({}).returning();
                 conversationId = newConversation.id;
+
+                await ctx.db.insert(conversationParticipants).values([
+                    {
+                        conversationId,
+                        userId: ctx.session.user.id,
+                    },
+                    {
+                        conversationId,
+                        userId,
+                    },
+                ]);
             }
 
             const [message] = await ctx.db.insert(messages).values({
@@ -152,15 +201,9 @@ export const chatRouter = createTRPCRouter({
             const { userId } = input;
 
             const existingConversation = await ctx.db.query.conversations.findFirst({
-                where: or(
-                    and(
-                        eq(conversations.user1Id, userId),
-                        eq(conversations.user2Id, ctx.session.user.id)
-                    ),
-                    and(
-                        eq(conversations.user1Id, ctx.session.user.id),
-                        eq(conversations.user2Id, userId)
-                    )
+                where: and(
+                    eq(conversationParticipants.userId, ctx.session.user.id),
+                    eq(conversationParticipants.userId, userId)
                 ),
             });
 
@@ -168,10 +211,18 @@ export const chatRouter = createTRPCRouter({
                 return existingConversation;
             }
 
-            const [conversation] = await ctx.db.insert(conversations).values({
-                user1Id: ctx.session.user.id,
-                user2Id: userId,
-            }).returning();
+            const [conversation] = await ctx.db.insert(conversations).values({}).returning();
+
+            await ctx.db.insert(conversationParticipants).values([
+                {
+                    conversationId: conversation.id,
+                    userId: ctx.session.user.id,
+                },
+                {
+                    conversationId: conversation.id,
+                    userId,
+                },
+            ]);
 
             return conversation;
         }),

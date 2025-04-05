@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/components/user-avatar";
 import { ChevronLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 interface ChatHeaderProps {
     name: string;
@@ -11,13 +11,14 @@ interface ChatHeaderProps {
 
 export function ChatHeader({ name, image, status }: ChatHeaderProps) {
     const router = useRouter();
+    const pathname = usePathname();
 
     return (
         <div className="flex items-center gap-4 border-b bg-background p-4">
             <Button
                 variant="outline"
                 size="icon"
-                onClick={() => router.back()}
+                onClick={() => router.push("/chat")}
                 className="rounded-full"
             >
                 <ChevronLeft className="h-5 w-5" />

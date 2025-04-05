@@ -2,6 +2,8 @@
 
 A peer-to-peer currency exchange Mini App built with MiniKit and World ID integration.
 
+![Group 4](https://github.com/user-attachments/assets/884ff56c-30e0-45c8-a835-ec3488668099)
+
 ## About
 
 Nomadia is a decentralized platform that enables users to exchange currency with others in their vicinity. The application facilitates secure peer-to-peer transactions through World ID verification and features an intuitive interface for managing listings and communications.

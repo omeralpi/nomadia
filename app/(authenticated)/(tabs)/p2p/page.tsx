@@ -1,8 +1,8 @@
 'use client';
 
+import { CitySearch } from "@/components/city-search";
 import { ListingMap } from "@/components/listing-map";
 import { QrDrawer } from "@/components/qr-drawer";
-import { SearchForm } from "@/components/search-form";
 import { Button } from "@/components/ui/button";
 import { RiMapPin2Line, RiQrCodeLine } from "@remixicon/react";
 import { useSession } from "next-auth/react";
@@ -42,6 +42,16 @@ export default function Page() {
         }
     }, []);
 
+    const handleCitySelect = (city: { latitude: number; longitude: number }) => {
+        if (mapRef) {
+            mapRef.panTo({
+                lat: city.latitude,
+                lng: city.longitude
+            });
+            mapRef.setZoom(12);
+        }
+    };
+
     return (
         <>
             <ListingMap
@@ -52,9 +62,7 @@ export default function Page() {
             />
             <div className="absolute inset-x-0 top-0 z-10 px-4 py-4 rounded-b-3xl flex gap-4 items-center">
                 <div className="relative flex-1">
-                    <SearchForm
-                        placeholder="Search location"
-                    />
+                    <CitySearch onCitySelect={handleCitySelect} />
                     <div className="absolute top-0 right-0 h-full flex justify-center items-center px-3">
                         <Button
                             size='icon'

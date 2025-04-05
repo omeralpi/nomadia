@@ -30,7 +30,7 @@ export function ChatList() {
             {conversations.map((conversation) => (
                 <Link
                     key={conversation.id}
-                    href={`/chat/${conversation.id}`}
+                    href={`/chat/${conversation.participants[0]?.id}`}
                     className={`py-3 block`}
                 >
                     <div className="relative items-center gap-4 flex items-center justify-between transition-colors">

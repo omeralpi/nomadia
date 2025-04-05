@@ -14,6 +14,8 @@ import {
 
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
+import { Button } from "./button"
+import { SubmitButton } from "./submit-button"
 
 const Form = FormProvider
 
@@ -166,9 +168,23 @@ const FormMessage = React.forwardRef<
 })
 FormMessage.displayName = "FormMessage"
 
+function FormSubmitButton({
+  children,
+  ...props
+}: React.ComponentProps<typeof Button>) {
+  const formContext = useFormContext()
+  const { formState } = formContext
+
+  return (
+    <SubmitButton isSubmitting={formState.isSubmitting} type="submit" {...props}>
+      {children}
+    </SubmitButton>
+  )
+}
+
 export {
   Form, FormControl,
   FormDescription, FormField, FormItem,
-  FormLabel, FormMessage, useFormField
+  FormLabel, FormMessage, FormSubmitButton, useFormField
 }
 

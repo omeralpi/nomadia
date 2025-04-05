@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function UserViewSkeleton() {
+export function AccountViewSkeleton() {
     return (
         <div className="space-y-4">
             <div className="flex justify-between">

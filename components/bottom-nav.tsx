@@ -46,8 +46,8 @@ export const BottomNav = () => {
             icon: RiChat1Line
         },
         {
-            label: "Profile",
-            path: `/users/${session?.user.id}`,
+            label: "Account",
+            path: `/account`,
             icon: RiUser3Line
         }
     ];

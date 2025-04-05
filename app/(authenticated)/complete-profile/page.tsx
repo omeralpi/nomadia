@@ -26,23 +26,18 @@ const profileSchema = z.object({
 
 type ProfileFormData = z.infer<typeof profileSchema>;
 
-export default function CompleteProfile() {
+export default function Page() {
     const router = useRouter();
     const { update } = useSession();
-    const utils = api.useUtils();
 
     const updateProfile = api.auth.updateUser.useMutation({
         onSuccess: async () => {
             toast.success("Profile saved successfully");
-            await Promise.all([
-                utils.user.get.invalidate(),
-                update({ trigger: "update" })
-            ]);
+
+            update({ trigger: "update" })
+
             router.push("/p2p");
-        },
-        onError: (error) => {
-            toast.error(error.message);
-        },
+        }
     });
 
     const form = useForm<ProfileFormData>({
@@ -98,14 +93,16 @@ export default function CompleteProfile() {
                                 )}
                             />
                         </div>
-
-                        <Button
-                            type="submit"
-                            className="w-full"
-                            disabled={updateProfile.isPending}
-                        >
-                            {updateProfile.isPending ? "Saving..." : "Save Profile"}
-                        </Button>
+                        <div className="fixed bottom-0 left-0 right-0 p-4">
+                            <Button
+                                type="submit"
+                                className="w-full"
+                                disabled={updateProfile.isPending}
+                            >
+                                {updateProfile.isPending ? "Saving..." : "Save Profile"}
+                            </Button>
+                            <div className="safe-area-spacer" />
+                        </div>
                     </form>
                 </Form>
             </div>

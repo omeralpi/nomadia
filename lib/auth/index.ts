@@ -1,6 +1,7 @@
-import { MiniKit, verifySiweMessage } from '@worldcoin/minikit-js'
+import { verifySiweMessage } from '@worldcoin/minikit-js'
 import { eq } from 'drizzle-orm'
-import { NextAuthOptions } from 'next-auth'
+import { NextAuthOptions, User } from 'next-auth'
+import { JWT } from 'next-auth/jwt'
 import Credentials from 'next-auth/providers/credentials'
 import { db } from '../db'
 import { users } from '../db/schema'
@@ -17,20 +18,12 @@ export const authOptions: NextAuthOptions = {
                 signedNonce: { label: 'Signed Nonce', type: 'text' },
                 finalPayloadJson: { label: 'Final Payload', type: 'text' },
             },
-            authorize: async ({
-                nonce,
-                signedNonce,
-                finalPayloadJson,
-            }: {
-                nonce: string
-                signedNonce: string
-                finalPayloadJson: string
-            }) => {
-                console.log({
-                    nonce,
-                    signedNonce,
-                    finalPayloadJson,
-                })
+            async authorize(credentials): Promise<User | null> {
+                if (!credentials?.nonce || !credentials?.signedNonce || !credentials?.finalPayloadJson) {
+                    return null
+                }
+
+                const { nonce, signedNonce, finalPayloadJson } = credentials
                 const expectedSignedNonce = getSignedNonce({ nonce })
 
                 if (signedNonce !== expectedSignedNonce) {
@@ -38,7 +31,6 @@ export const authOptions: NextAuthOptions = {
                     return null
                 }
 
-                console.log({ MiniKit, nonce, finalPayloadJson })
                 const finalPayload = JSON.parse(finalPayloadJson)
                 const result = await verifySiweMessage(finalPayload, nonce)
 
@@ -52,24 +44,43 @@ export const authOptions: NextAuthOptions = {
                 })
 
                 if (user) {
-                    return user
+                    return {
+                        id: user.id,
+                        name: user.name,
+                        image: user.image,
+                        address: user.address,
+                        email: null
+                    }
                 }
 
-                const newUser = await db.insert(users).values({
+                const [newUser] = await db.insert(users).values({
                     address: result.siweMessageData.address,
                 }).returning()
 
-                return newUser
+                return {
+                    id: newUser.id,
+                    name: newUser.name,
+                    image: newUser.image,
+                    address: newUser.address,
+                    email: null
+                }
             },
         }),
     ],
     callbacks: {
-        async jwt({ token, user }) {
+        async jwt({ token, user, trigger }) {
+            if (trigger === 'update') {
+                return await handleTokenUpdate(token)
+            }
+
             if (user) {
-                token.userId = user.id
-                token.name = user.name
-                token.image = user.image
-                token.address = user.address
+                return {
+                    ...token,
+                    userId: user.id,
+                    name: user.name,
+                    image: user.image,
+                    address: user.address,
+                }
             }
 
             return token
@@ -86,4 +97,20 @@ export const authOptions: NextAuthOptions = {
         },
     },
     debug: process.env.NODE_ENV === "development",
+}
+
+async function handleTokenUpdate(token: JWT) {
+    const dbUser = await db.query.users.findFirst({
+        where: eq(users.address, token.address as string),
+    })
+
+    if (!dbUser) {
+        return token
+    }
+
+    return {
+        ...token,
+        name: dbUser.name,
+        image: dbUser.image,
+    }
 }

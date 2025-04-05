@@ -45,6 +45,7 @@ export function AvatarUpload({
 
     const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
+
         if (file) {
             const reader = new FileReader();
             reader.onloadend = () => {
@@ -69,7 +70,7 @@ export function AvatarUpload({
             >
                 <AvatarImage src={displayImage ?? ""} />
                 <AvatarFallback>{fallback}</AvatarFallback>
-                <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 transition-opacity">
                     {isUploading ? (
                         <Loader2 className="h-6 w-6 text-white animate-spin" />
                     ) : (
@@ -80,11 +81,10 @@ export function AvatarUpload({
             <label
                 htmlFor="avatar-upload"
                 className={cn(
-                    "absolute bottom-0 right-0 p-1 rounded-full bg-primary hover:bg-primary/90 cursor-pointer transition-colors",
-                    isUploading && "pointer-events-none opacity-50"
+                    "absolute bottom-0 right-0 p-2 rounded-full bg-primary hover:bg-primary/90 cursor-pointer transition-colors opacity-0",
                 )}
             >
-                <Camera className="h-4 w-4 text-primary-foreground" />
+                <Camera className="size-5 text-primary-foreground" />
                 <input
                     id="avatar-upload"
                     type="file"

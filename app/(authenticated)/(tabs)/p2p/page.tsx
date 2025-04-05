@@ -5,6 +5,8 @@ import { QrDrawer } from "@/components/qr-drawer";
 import { SearchForm } from "@/components/search-form";
 import { Button } from "@/components/ui/button";
 import { RiMapPin2Line, RiQrCodeLine } from "@remixicon/react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Page() {
@@ -13,6 +15,8 @@ export default function Page() {
         longitude: number;
     }>();
     const [mapRef, setMapRef] = useState<google.maps.Map | null>(null);
+    const { data: session } = useSession();
+    const router = useRouter();
 
     useEffect(() => {
         if (navigator.geolocation) {
@@ -29,6 +33,12 @@ export default function Page() {
             );
         }
     }, []);
+
+    useEffect(() => {
+        if (!session?.user.name) {
+            router.push("/complete-profile");
+        }
+    }, [session, router]);
 
     return (
         <>

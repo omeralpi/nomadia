@@ -20,4 +20,6 @@ export const createUserSchema = createInsertSchema(users)
 export const updateUserSchema = createInsertSchema(users).pick({
   name: true,
   image: true,
+}).required({
+  name: true,
 })

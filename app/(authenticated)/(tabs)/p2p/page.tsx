@@ -1,6 +1,7 @@
 'use client';
 
 import { ListingMap } from "@/components/listing-map";
+import { QrDrawer } from "@/components/qr-drawer";
 import { SearchForm } from "@/components/search-form";
 import { Button } from "@/components/ui/button";
 import { RiMapPin2Line, RiQrCodeLine } from "@remixicon/react";
@@ -60,12 +61,14 @@ export default function Page() {
                         </Button>
                     </div>
                 </div>
-                <Button
-                    size="icon"
-                    className="rounded-full [&_svg]:size-8 size-14"
-                >
-                    <RiQrCodeLine />
-                </Button>
+                <QrDrawer>
+                    <Button
+                        size="icon"
+                        className="rounded-full [&_svg]:size-8 size-14"
+                    >
+                        <RiQrCodeLine />
+                    </Button>
+                </QrDrawer>
             </div>
         </>
     );

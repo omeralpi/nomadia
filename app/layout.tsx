@@ -1,13 +1,14 @@
-import MiniKitProvider from "@/components/minikit-provider";
-import NextAuthProvider from "@/components/next-auth-provider";
-import { TRPCProvider } from "@/components/trpc-provider";
+import MiniKitProvider from "@/components/providers/minikit-provider";
+import NextAuthProvider from "@/components/providers/next-auth-provider";
+import { TRPCProvider } from "@/components/providers/trpc-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
-import { Noto_Sans } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
-const notoSans = Noto_Sans({
+const inter = Inter({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
 });
@@ -23,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const ErudaProvider = dynamic(
-    () => import("../components/Eruda").then((c) => c.ErudaProvider),
+    () => import("../components/eruda").then((c) => c.ErudaProvider),
     {
       ssr: false,
     }
@@ -31,7 +32,11 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body className={notoSans.className}>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+      </head>
+      <body className={cn(inter.className, "antialiased dark relative")}>
+        <div className="fixed top-[-150px] right-[-150px] w-[300px] h-[300px] rounded-full bg-primary/30 blur-[100px] pointer-events-none z-10" aria-hidden="true" />
         <NextAuthProvider>
           <TRPCProvider>
             <ErudaProvider>

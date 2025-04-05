@@ -43,55 +43,60 @@ export function ProfileForm({ defaultValues, onSubmit, isSubmitting }: ProfileFo
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <div className="flex flex-col items-center space-y-4">
-                    <AvatarUpload
-                        currentImage={form.watch("image")}
-                        fallback={form.watch("name")?.[0]}
-                        onUploadSuccess={handleAvatarUpload}
-                        onUploadError={(error) => toast.error(error.message)}
-                        size="md"
+            <form onSubmit={form.handleSubmit(onSubmit)} className="relative pb-24">
+                <div className="space-y-6">
+                    <div className="flex flex-col items-center space-y-4">
+                        <AvatarUpload
+                            currentImage={form.watch("image")}
+                            fallback={form.watch("name")?.[0]}
+                            onUploadSuccess={handleAvatarUpload}
+                            onUploadError={(error) => toast.error(error.message)}
+                            size="md"
+                        />
+                    </div>
+
+                    <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Name</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="Your name" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="bio"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Bio</FormLabel>
+                                <FormControl>
+                                    <Textarea
+                                        placeholder="Tell us about yourself"
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
                     />
                 </div>
 
-                <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Name</FormLabel>
-                            <FormControl>
-                                <Input placeholder="Your name" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="bio"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Bio</FormLabel>
-                            <FormControl>
-                                <Textarea
-                                    placeholder="Tell us about yourself"
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <Button
-                    type="submit"
-                    className="w-full"
-                    disabled={isSubmitting}
-                >
-                    {isSubmitting ? "Saving..." : "Save Changes"}
-                </Button>
+                <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t md:relative md:p-0 md:bg-transparent md:border-0 md:mt-6">
+                    <Button
+                        type="submit"
+                        className="w-full"
+                        disabled={isSubmitting}
+                    >
+                        {isSubmitting ? "Saving..." : "Save Changes"}
+                    </Button>
+                    <div className="safe-area-spacer" />
+                </div>
             </form>
         </Form>
     );

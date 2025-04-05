@@ -36,9 +36,9 @@ export default function Page() {
             <div className="space-y-6">
                 <div className="relative flex items-center justify-center">
                     <Button
-                        variant="ghost"
+                        variant="outline"
                         size="icon"
-                        className="absolute left-0"
+                        className="absolute left-0 rounded-full"
                         onClick={() => router.back()}
                     >
                         <ChevronLeft className="h-5 w-5" />

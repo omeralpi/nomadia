@@ -1,14 +1,20 @@
 "use client";
 
-import { Compass, Home, LucideIcon, MessageCircle, User, Wallet } from "lucide-react";
-import { useSession } from "next-auth/react";
+import {
+    RiAddLine,
+    RiChat1Line,
+    RiEarthLine,
+    RiFileList2Line,
+    RiUser3Line
+} from '@remixicon/react';
+import { useSession } from 'next-auth/react';
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
 type NavItem = {
     label: string;
     path: string;
-    icon: LucideIcon;
+    icon: React.ElementType;
     variant?: "default" | "floating";
 };
 
@@ -18,11 +24,32 @@ export const BottomNav = () => {
     const { data: session } = useSession();
 
     const navItems: NavItem[] = [
-        { label: "Feed", path: "/home", icon: Home },
-        { label: "Discover", path: "/discover", icon: Compass },
-        { label: "P2P", path: "/p2p", icon: Wallet, variant: "floating" },
-        { label: "Chat", path: "/chat", icon: MessageCircle },
-        { label: "Profile", path: `/users/${session?.user?.id}`, icon: User },
+        {
+            label: "Earth",
+            path: "/earth",
+            icon: RiEarthLine
+        },
+        {
+            label: "My Listings",
+            path: "/my-listings",
+            icon: RiFileList2Line
+        },
+        {
+            label: "New Listing",
+            path: "/new-listing",
+            icon: RiAddLine,
+            variant: "floating"
+        },
+        {
+            label: "Messages",
+            path: "/chat",
+            icon: RiChat1Line
+        },
+        {
+            label: "Profile",
+            path: `/users/${session?.user.id}`,
+            icon: RiUser3Line
+        }
     ];
 
     const isActive = (path: string) => pathname === path;
@@ -39,45 +66,43 @@ export const BottomNav = () => {
     };
 
     const renderNavItem = ({ path, label, icon: Icon, variant = "default" }: NavItem) => {
-        const styles = {
-            default: {
-                container: "flex w-full flex-col items-center justify-center space-y-1",
-                icon: "relative flex items-center justify-center",
-                iconSize: "h-6 w-6 transition-colors"
-            },
-            floating: {
-                container: "flex w-full flex-col items-center justify-center space-y-1 relative -top-5",
-                icon: "relative flex items-center justify-center bg-primary rounded-full p-4 shadow-xl hover:bg-primary/90 transition-colors",
-                iconSize: "h-7 w-7 transition-colors text-primary-foreground"
-            }
-        };
+        if (variant === "floating") {
+            return (
+                <Link
+                    key={path}
+                    href={path}
+                    onClick={(e) => handleNavClick(e, path)}
+                    className="relative -translate-y-[10px] flex flex-col items-center justify-center -mt-6 p-4 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors"
+                    tabIndex={0}
+                >
+                    <Icon className="h-6 w-6" />
+                </Link>
+            );
+        }
 
         return (
             <Link
                 key={path}
                 href={path}
                 onClick={(e) => handleNavClick(e, path)}
-                className={`${styles[variant].container} ${isActive(path) ? "text-foreground" : "text-gray-400"}`}
+                className={`py-3 flex w-full flex-col items-center justify-center space-y-1 relative before:absolute before:top-0 before:h-[3px] before:w-full before:scale-x-0 before:bg-primary before:transition-transform before:duration-200 before:shadow-[0_2px_4px_rgba(var(--primary)/.25)] data-[active=true]:before:scale-x-100 ${isActive(path) ? "text-foreground" : "text-gray-400"}`}
+                data-active={isActive(path)}
                 tabIndex={0}
             >
-                <div className={styles[variant].icon}>
-                    <Icon className={styles[variant].iconSize} />
+                <div className="relative flex items-center justify-center">
+                    <Icon className="h-6 w-6 transition-colors" />
                 </div>
-                <span className={`text-xs font-medium ${variant === "floating" && "hidden"}`}>
-                    {label}
-                </span>
+                <div className="text-xs">{label}</div>
             </Link>
         );
     };
 
     return (
-        <>
-            <nav className="fixed bottom-0 left-0 right-0 border-t bg-background">
-                <div className="flex h-16 items-center justify-around">
-                    {navItems.map((item) => renderNavItem(item))}
-                </div>
-                <div className="safe-area-spacer" />
-            </nav>
-        </>
+        <nav className="bg-background/75 backdrop-blur-sm z-10 relative">
+            <div className="flex items-center justify-around">
+                {navItems.map((item) => renderNavItem(item))}
+            </div>
+            <div className="safe-area-spacer" />
+        </nav>
     );
 };

@@ -42,15 +42,9 @@ export const authOptions: NextAuthOptions = {
             return true;
         },
 
-        jwt: async ({ token, user, trigger }) => {
-            const dbUser = await db.query.users.findFirst({
-                where: eq(users.id, token.id as string),
-            });
-
-            if (dbUser) {
-                token.name = dbUser.name;
-                token.bio = dbUser.bio ?? undefined;
-                token.image = dbUser.image ?? undefined;
+        async jwt({ token, user }) {
+            if (user) {
+                token.sub = user.id;
             }
 
             return token;
@@ -61,10 +55,16 @@ export const authOptions: NextAuthOptions = {
                 return session;
             }
 
-            session.user.id = token.id as string;
-            session.user.name = token.name as string;
-            session.user.bio = token.bio;
-            session.user.image = token.image as string | null;
+            const dbUser = await db.query.users.findFirst({
+                where: eq(users.id, token.sub as string),
+            });
+
+            if (dbUser) {
+                session.user.id = dbUser.id;
+                session.user.name = dbUser.name;
+                session.user.bio = dbUser.bio ?? undefined;
+                session.user.image = dbUser.image ?? undefined;
+            }
 
             return session;
         },

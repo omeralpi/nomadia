@@ -92,25 +92,23 @@ export function IntroSlider() {
                 )}
             </Carousel>
 
-            <div className="absolute bottom-12 left-0 right-0 flex flex-col items-center gap-4">
-                {isLastSlide ? (
+            <div className="absolute bottom-0 space-y-6 left-0 right-0 flex flex-col items-center gap-4">
+                {isLastSlide && (
                     <Button
                         className="w-[200px] animate-in fade-in-50 duration-500"
                         onClick={() => signIn("worldcoin")}
-                        size="lg"
                     >
                         Start Trading
                     </Button>
-                ) : (
-                    <div className="flex gap-2">
-                        {slides.map((_, index) => (
-                            <div
-                                key={index}
-                                className={`h-2 w-2 rounded-full transition-colors ${currentSlide === index ? "bg-primary" : "bg-primary/20"}`}
-                            />
-                        ))}
-                    </div>
                 )}
+                <div className="flex gap-2">
+                    {slides.map((_, index) => (
+                        <div
+                            key={index}
+                            className={`h-2 w-2 rounded-full transition-colors ${currentSlide === index ? "bg-primary" : "bg-primary/20"}`}
+                        />
+                    ))}
+                </div>
             </div>
         </div>
     )

@@ -8,6 +8,7 @@ import { api } from "@/lib/api";
 import { calculateDistance, cn, formatAmount } from "@/lib/utils";
 import { GoogleMap, OverlayView, useLoadScript } from "@react-google-maps/api";
 import { MessageCircleIcon } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useRef, useState } from "react";
 import "swiper/css";
@@ -39,6 +40,7 @@ export function ListingMap({ className, currentLocation, showCurrentLocation, on
     const [mapRef, setMapRef] = useState<google.maps.Map | null>(null);
     const swiperRef = useRef<SwiperType | null>(null);
     const router = useRouter();
+    const { data: session } = useSession();
 
     const { isLoaded } = useLoadScript({
         googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!
@@ -208,6 +210,7 @@ export function ListingMap({ className, currentLocation, showCurrentLocation, on
                 zoom={currentLocation ? 14 : 2}
                 center={mapCenter}
                 options={options}
+
                 onLoad={map => {
                     setMapRef(map);
                     onMapLoad?.(map);
@@ -308,7 +311,7 @@ export function ListingMap({ className, currentLocation, showCurrentLocation, on
                                                     />
                                                     <div className="flex-1 space-y-1">
                                                         <div className="flex items-center justify-between">
-                                                            <div className="font-medium">{listing.user.name}</div>
+                                                            <div className="font-medium">{listing.user.name || "Anonymous"}</div>
                                                             {distance && (
                                                                 <div className="text-xs text-muted-foreground">
                                                                     {formatDistance(distance)}
@@ -325,6 +328,7 @@ export function ListingMap({ className, currentLocation, showCurrentLocation, on
                                                 </div>
                                                 <Button
                                                     className="w-full"
+                                                    disabled={listing.user.id === session?.user.id}
                                                     onClick={(e) => {
                                                         e.stopPropagation();
 
@@ -335,7 +339,7 @@ export function ListingMap({ className, currentLocation, showCurrentLocation, on
                                                         router.push(`/chat/${listing.user.id}?userName=${listing.user.name}&userImage=${listing.user.image}&initialMessage=${encodeURIComponent(defaultMessage)}`);
                                                     }}
                                                 >
-                                                    Send Message
+                                                    {listing.user.id === session?.user.id ? "Your Listing" : "Send Message"}
                                                     <MessageCircleIcon className="ml-2 h-4 w-4" />
                                                 </Button>
                                             </div>

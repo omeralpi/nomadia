@@ -29,7 +29,7 @@ export async function seed() {
         },
         {
             code: "USDCE",
-            name: "USDC",
+            name: "USDCe",
             type: "crypto" as const,
             iconUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Circle_USDC_Logo.svg/1024px-Circle_USDC_Logo.svg.png?20220815163658"
         },

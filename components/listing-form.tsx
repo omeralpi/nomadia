@@ -212,7 +212,7 @@ export const ListingForm = ({
                     />
                 </div>
 
-                <div className="fixed bottom-0 left-0 right-0 p-4">
+                <div className="fixed bottom-0 left-0 right-0 p-4 bg-background z-10">
                     <FormSubmitButton type="submit" className="w-full" disabled={!currentLocation}>
                         <RiMoneyDollarCircleLine className="w-5 h-5" />
                         Submit

@@ -16,7 +16,7 @@ export default function Page() {
     }>();
     const [mapRef, setMapRef] = useState<google.maps.Map | null>(null);
 
-    const { data: session, status } = useSession();
+    const { data: session } = useSession();
 
     const router = useRouter();
 

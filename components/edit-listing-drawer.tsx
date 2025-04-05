@@ -6,6 +6,7 @@ import { DefaultLayout } from "./default-layout";
 import { ListingForm, ListingFormValues } from "./listing-form";
 import { PageHeader } from "./page-header";
 import { Drawer, DrawerContent, DrawerTrigger } from "./ui/drawer";
+import { ScrollArea } from "./ui/scroll-area";
 
 interface EditListingDrawerProps {
     listing: ListingWithRelations;
@@ -49,21 +50,23 @@ export const EditListingDrawer = ({ listing, children }: EditListingDrawerProps)
                 {children}
             </DrawerTrigger>
             <DrawerContent className="h-[96%]">
-                <DefaultLayout>
-                    <PageHeader title="Edit Listing" />
-                    <ListingForm
-                        defaultValues={{
-                            type: listing.type,
-                            amount: Number(listing.amount),
-                            currencyCode: listing.currencyCode,
-                            latitude: Number(listing.latitude),
-                            longitude: Number(listing.longitude),
-                            currencyType: listing.currency.type,
-                        }}
-                        onSubmit={handleSubmit}
-                    />
-                    <div className="safe-area-spacer" />
-                </DefaultLayout>
+                <ScrollArea className='overflow-auto h-full'>
+                    <DefaultLayout>
+                        <PageHeader title="Edit Listing" className="bg-background z-10 py-4 -my-4" />
+                        <ListingForm
+                            defaultValues={{
+                                type: listing.type,
+                                amount: Number(listing.amount),
+                                currencyCode: listing.currencyCode,
+                                latitude: Number(listing.latitude),
+                                longitude: Number(listing.longitude),
+                                currencyType: listing.currency.type,
+                            }}
+                            onSubmit={handleSubmit}
+                        />
+                        <div className="safe-area-spacer" />
+                    </DefaultLayout>
+                </ScrollArea>
             </DrawerContent>
         </Drawer>
     );

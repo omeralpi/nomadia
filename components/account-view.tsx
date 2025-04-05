@@ -44,7 +44,7 @@ export function AccountView() {
                         </AvatarFallback>
                     </Avatar>
                     <div className="space-y-1">
-                        <div className="font-medium">{session?.user?.name}</div>
+                        <div className="font-medium">{session?.user?.name ?? "Anonymous"}</div>
                         <div
                             className="text-sm flex items-center gap-2 text-muted-foreground"
                         >

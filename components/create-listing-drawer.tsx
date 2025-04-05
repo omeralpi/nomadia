@@ -5,6 +5,7 @@ import { DefaultLayout } from "./default-layout";
 import { ListingForm, ListingFormValues } from "./listing-form";
 import { PageHeader } from "./page-header";
 import { Drawer, DrawerContent, DrawerTrigger } from "./ui/drawer";
+import { ScrollArea } from "./ui/scroll-area";
 
 export const CreateListingDrawer = ({ children }: {
     children: React.ReactNode;
@@ -41,17 +42,19 @@ export const CreateListingDrawer = ({ children }: {
             <DrawerTrigger asChild>
                 {children}
             </DrawerTrigger>
-            <DrawerContent className="h-[96%]">
-                <DefaultLayout>
-                    <PageHeader title="Create New Listing" />
-                    <ListingForm
-                        defaultValues={{
-                            type: "buying",
-                        }}
-                        onSubmit={handleSubmit}
-                    />
-                    <div className="safe-area-spacer" />
-                </DefaultLayout>
+            <DrawerContent className="h-[100%]">
+                <ScrollArea className='overflow-auto h-full'>
+                    <DefaultLayout>
+                        <PageHeader title="Create New Listing" className="bg-background z-10 py-4 -my-4" />
+                        <ListingForm
+                            defaultValues={{
+                                type: "buying",
+                            }}
+                            onSubmit={handleSubmit}
+                        />
+                        <div className="safe-area-spacer" />
+                    </DefaultLayout>
+                </ScrollArea>
             </DrawerContent>
         </Drawer>
     );

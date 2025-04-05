@@ -8,24 +8,15 @@ Nomadia is a decentralized platform that enables users to exchange currency with
 
 ## ⚙️ Tech Stack
 
-🔹 Next.js ⚡ (Frontend framework)
-
-🔹 PostgreSQL 🗄️ (Database)
-
-🔹 Drizzle ORM 🎯 (TypeScript ORM)
-
-🔹 Cloudinary ☁️ (Image storage)
-
-🔹 TailwindCSS 🎨 (Styling)
-
-🔹 Shadcn/UI 🎯 (UI Components)
-
-🔹 tRPC 🎯 (API layer)
-
-### World Technologies
-🌍 MiniKit (Mini App Development Kit)
-🌍 World ID (Identity Verification)
-🌍 World SDK (World App Integration)
+- 🌍 MiniKit (Mini App Development Kit)
+- 🌍 World SDK (World App Integration)
+- 🔹 Next.js ⚡ (Frontend framework)
+- 🔹 PostgreSQL 🗄️ (Database)
+- 🔹 Drizzle ORM 🎯 (TypeScript ORM)
+- 🔹 Cloudinary ☁️ (Image storage)
+- 🔹 TailwindCSS 🎨 (Styling)
+- 🔹 Shadcn/UI 🎯 (UI Components)
+- 🔹 tRPC 🎯 (API layer)
 
 ## Setup
 

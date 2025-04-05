@@ -36,6 +36,7 @@ export default function RootLayout({
       </head>
       <body className={cn(inter.className, spaceGrotesk.variable, "antialiased dark relative")}>
         <div className="fixed top-[-150px] right-[-150px] w-[300px] h-[300px] rounded-full bg-primary/40 blur-[100px] pointer-events-none z-10" aria-hidden="true" />
+        <div className="fixed bottom-[-150px] left-[-150px] w-[300px] h-[300px] rounded-full bg-primary/40 blur-[100px] pointer-events-none z-10" aria-hidden="true" />
         <NextAuthProvider>
           <TRPCProvider>
             {/* <ErudaProvider> */}

@@ -35,10 +35,10 @@ export default function Page() {
                 currentLocation={location}
                 showCurrentLocation={true}
             />
-            <div className="absolute inset-x-0 top-0 z-10 px-4 py-4 bg-background backdrop-blur rounded-b-3xl">
+            <div className="absolute inset-x-0 top-0 z-10 px-4 py-4 rounded-b-3xl">
                 <div className="relative">
-                    <RiSearchLine className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground size-[16px]" />
-                    <Input className="pl-12 bg-muted rounded-3xl" placeholder="Search location" />
+                    <RiSearchLine className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground size-[16px z-10" />
+                    <Input className="pl-12 bg-muted/50 backdrop-blur rounded-3xl" placeholder="Search location" />
                     <Button
                         size='icon'
                         className="rounded-full absolute right-3 top-1/2 -translate-y-1/2"

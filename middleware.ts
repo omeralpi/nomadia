@@ -21,7 +21,7 @@ export function middleware(request: NextRequest) {
         request.cookies.get("__Secure-next-auth.session-token")?.value;
 
     if (isPublicPath && token) {
-        return NextResponse.redirect(new URL("/earth", request.url));
+        return NextResponse.redirect(new URL("/p2p", request.url));
     }
 
     if (!isPublicPath && !token) {

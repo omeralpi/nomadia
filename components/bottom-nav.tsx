@@ -1,5 +1,6 @@
 "use client";
 
+import { api } from "@/lib/api";
 import {
     RiAddLine,
     RiChat1Line,
@@ -19,6 +20,7 @@ type NavItem = {
 
 export const BottomNav = () => {
     const pathname = usePathname();
+    const { data: unreadCount = 0 } = api.chat.getTotalUnreadCount.useQuery();
 
     const navItems: NavItem[] = [
         {
@@ -74,6 +76,11 @@ export const BottomNav = () => {
             >
                 <div className="relative flex items-center justify-center">
                     <Icon className="h-6 w-6 transition-colors" />
+                    {label === "Messages" && unreadCount > 0 && (
+                        <div className="absolute -right-2 -top-1 size-4 rounded-full bg-primary text-[10px] font-medium flex items-center justify-center text-primary-foreground">
+                            {unreadCount}
+                        </div>
+                    )}
                 </div>
                 <div className="text-xs">{label}</div>
             </Link>

@@ -300,4 +300,21 @@ export const chatRouter = createTRPCRouter({
                     )
                 );
         }),
+
+    getTotalUnreadCount: protectedProcedure.query(async ({ ctx }) => {
+        const unreadMessages = await ctx.db
+            .select({ id: messages.id })
+            .from(messages)
+            .innerJoin(
+                conversationParticipants,
+                eq(messages.conversationId, conversationParticipants.conversationId)
+            )
+            .where(and(
+                eq(conversationParticipants.userId, ctx.session.user.id),
+                eq(messages.isRead, false),
+                not(eq(messages.senderId, ctx.session.user.id))
+            ));
+
+        return unreadMessages.length;
+    }),
 }); 

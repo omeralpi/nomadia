@@ -5,13 +5,15 @@ interface EmptyStateProps {
     description?: string;
     icon?: React.ReactNode;
     className?: string;
+    action?: React.ReactNode;
 }
 
 export function EmptyState({
     title,
     description,
     icon,
-    className
+    className,
+    action
 }: EmptyStateProps) {
     return (
         <div className={cn(
@@ -29,6 +31,11 @@ export function EmptyState({
                     <p className="text-sm text-muted-foreground">{description}</p>
                 )}
             </div>
+            {action && (
+                <div className="mt-4">
+                    {action}
+                </div>
+            )}
         </div>
     );
 } 

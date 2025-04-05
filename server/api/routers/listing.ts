@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { createListingSchema, listings, updateListingSchema } from "@/lib/db/schema";
+import { createListingSchema, currencies, listings, updateListingSchema } from "@/lib/db/schema";
 import { TRPCError } from "@trpc/server";
 import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
@@ -96,10 +96,23 @@ export const listingRouter = createTRPCRouter({
         }),
 
     currencies: protectedProcedure
-        .query(async () => {
-            const currencies = await db.query.currencies.findMany();
+        .input(z.object({
+            type: z.enum(["fiat", "crypto"]).optional(),
+        }))
+        .query(async ({
+            input
+        }) => {
+            const filters = [];
 
-            return currencies;
+            if (input.type) {
+                filters.push(eq(currencies.type, input.type));
+            }
+
+            const currenciesList = await db.query.currencies.findMany({
+                where: and(...filters),
+            });
+
+            return currenciesList;
         }),
 
     myListings: protectedProcedure

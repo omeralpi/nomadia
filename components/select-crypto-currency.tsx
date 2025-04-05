@@ -28,9 +28,8 @@ export function SelectCryptoCurrency({
 }: SelectCryptoCurrencyProps) {
     const [open, setOpen] = React.useState(false);
 
-    const { data: currencies = [] } = api.listing.currencies.useQuery({
-        type: "crypto",
-    });
+    const { data: currencies = [] } = api.listing.currencies.useQuery();
+    const filteredCurrencies = currencies.filter((currency) => currency.type === "crypto");
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
@@ -44,16 +43,16 @@ export function SelectCryptoCurrency({
                     {value
                         ? (
                             <div className="flex items-center gap-2">
-                                {currencies.find((currency) => currency.code === value)?.iconUrl && (
+                                {filteredCurrencies.find((currency) => currency.code === value)?.iconUrl && (
                                     <Image
-                                        src={currencies.find((currency) => currency.code === value)?.iconUrl || ""}
+                                        src={filteredCurrencies.find((currency) => currency.code === value)?.iconUrl || ""}
                                         alt={value}
                                         width={24}
                                         height={24}
                                         className="rounded-full"
                                     />
                                 )}
-                                {currencies.find((currency) => currency.code === value)?.name}
+                                {filteredCurrencies.find((currency) => currency.code === value)?.name}
                             </div>
                         )
                         : "Select cryptocurrency..."}
@@ -65,7 +64,7 @@ export function SelectCryptoCurrency({
                     <CommandInput placeholder="Search cryptocurrency..." />
                     <CommandEmpty>No cryptocurrency found.</CommandEmpty>
                     <CommandGroup>
-                        {currencies.map((currency) => (
+                        {filteredCurrencies.map((currency) => (
                             <CommandItem
                                 key={currency.code}
                                 value={currency.code}

@@ -154,11 +154,12 @@ export const chatRouter = createTRPCRouter({
         .mutation(async ({ ctx, input }) => {
             const { content, userId } = input;
 
-            const participantsCount = await ctx.db.select({
-                count: conversations.id
-            })
+            const participantsCount = await ctx.db
+                .select({
+                    id: conversations.id
+                })
                 .from(conversations)
-                .innerJoin(conversationParticipants, eq(conversations.id, conversationParticipants.conversationId))
+                .innerJoin(conversationParticipants as any, eq(conversations.id, conversationParticipants.conversationId))
                 .where(
                     and(
                         eq(conversationParticipants.userId, ctx.session.user.id),
@@ -177,36 +178,27 @@ export const chatRouter = createTRPCRouter({
 
             let conversationId: number;
             if (participantsCount.length > 0) {
-                const [conversation] = await ctx.db.select()
-                    .from(conversations)
-                    .innerJoin(conversationParticipants, eq(conversations.id, conversationParticipants.conversationId))
-                    .where(
-                        and(
-                            eq(conversationParticipants.userId, ctx.session.user.id),
-                            exists(
-                                ctx.db.select()
-                                    .from(conversationParticipants)
-                                    .where(
-                                        and(
-                                            eq(conversationParticipants.conversationId, conversations.id),
-                                            eq(conversationParticipants.userId, userId)
-                                        )
-                                    )
-                            )
-                        )
-                    );
-                conversationId = conversation.conversations.id;
+                conversationId = participantsCount[0].id;
             } else {
                 const [newConversation] = await ctx.db.insert(conversations).values({}).returning();
                 conversationId = newConversation.id;
-
-                await ctx.db.insert(conversationParticipants).values([
+                console.log([
                     {
-                        conversationId,
+                        conversationId: conversationId,
                         userId: ctx.session.user.id,
                     },
                     {
-                        conversationId,
+                        conversationId: conversationId,
+                        userId,
+                    },
+                ])
+                await ctx.db.insert(conversationParticipants).values([
+                    {
+                        conversationId: conversationId,
+                        userId: ctx.session.user.id,
+                    },
+                    {
+                        conversationId: conversationId,
                         userId,
                     },
                 ]);

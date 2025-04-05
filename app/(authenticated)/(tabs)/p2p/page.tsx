@@ -15,8 +15,16 @@ export default function Page() {
         longitude: number;
     }>();
     const [mapRef, setMapRef] = useState<google.maps.Map | null>(null);
-    const { data: session } = useSession();
+
+    const { data: session, status } = useSession();
+
     const router = useRouter();
+
+    useEffect(() => {
+        if (session?.user.address && !session.user.name) {
+            router.push("/complete-profile");
+        }
+    }, [session]);
 
     useEffect(() => {
         if (navigator.geolocation) {
@@ -33,12 +41,6 @@ export default function Page() {
             );
         }
     }, []);
-
-    useEffect(() => {
-        if (!session?.user.name) {
-            router.push("/complete-profile");
-        }
-    }, [session, router]);
 
     return (
         <>

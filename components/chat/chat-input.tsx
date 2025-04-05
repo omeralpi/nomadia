@@ -55,14 +55,16 @@ export function ChatInput({ userId }: ChatInputProps) {
                     className="rounded-3xl bg-muted min-h-[34px] max-h-[150px] resize-none"
                     disabled={isPending}
                 />
-                <Button
-                    onClick={handleSubmit}
-                    size='icon'
-                    disabled={!content.trim() || isPending}
-                    className="absolute right-2 top-1/2 h-10 w-10 -translate-y-1/2 rounded-full"
-                >
-                    <RiSendPlane2Fill className="h-5 w-5" />
-                </Button>
+                <div className="flex absolute top-0 right-0 bottom-0 px-4 items-center">
+                    <Button
+                        onClick={handleSubmit}
+                        size='icon'
+                        disabled={!content.trim() || isPending}
+                        className="h-10 w-10 rounded-full"
+                    >
+                        <RiSendPlane2Fill className="h-5 w-5" />
+                    </Button>
+                </div>
             </div>
             <div className="safe-area-spacer" />
         </div>

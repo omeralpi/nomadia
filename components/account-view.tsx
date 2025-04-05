@@ -15,12 +15,12 @@ export function AccountView() {
     const menu = [
         {
             label: "Account Settings",
-            href: "/account-settings",
+            href: "/account/settings",
             icon: RiSettings2Line
         },
         {
             label: "Transaction History",
-            href: "/transaction-history",
+            href: "/account/transaction-history",
             icon: RiHistoryLine
         },
         {

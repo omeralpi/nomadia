@@ -11,7 +11,6 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -19,7 +18,6 @@ import { z } from "zod";
 
 const profileSchema = z.object({
     name: z.string().min(1, "Name is required"),
-    bio: z.string().optional(),
     image: z.string().optional(),
 });
 
@@ -63,23 +61,6 @@ export function ProfileForm({ defaultValues, onSubmit, isSubmitting }: ProfileFo
                                 <FormLabel>Name</FormLabel>
                                 <FormControl>
                                     <Input placeholder="Your name" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField
-                        control={form.control}
-                        name="bio"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Bio</FormLabel>
-                                <FormControl>
-                                    <Textarea
-                                        placeholder="Tell us about yourself"
-                                        {...field}
-                                    />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>

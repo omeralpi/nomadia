@@ -1,7 +1,8 @@
+import { getToken } from "next-auth/jwt";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
     const path = request.nextUrl.pathname;
 
     const publicPaths = ["/"];
@@ -16,9 +17,7 @@ export function middleware(request: NextRequest) {
         return NextResponse.next();
     }
 
-    const token =
-        request.cookies.get("next-auth.session-token")?.value ||
-        request.cookies.get("__Secure-next-auth.session-token")?.value;
+    const token = await getToken({ req: request });
 
     if (isPublicPath && token) {
         return NextResponse.redirect(new URL("/p2p", request.url));

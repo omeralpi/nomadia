@@ -1,3 +1,5 @@
+import { db } from "@/lib/db";
+import { transactions } from "@/lib/db/schema";
 import { MiniAppPaymentSuccessPayload } from "@worldcoin/minikit-js";
 import { cookies } from "next/headers";
 import { z } from "zod";
@@ -40,9 +42,21 @@ export const paymentRouter = createTRPCRouter({
                         },
                     }
                 );
+
                 const transaction = await response.json();
 
                 if (transaction.reference === reference && transaction.status !== "failed") {
+                    await db.insert(transactions).values({
+                        transactionId: transaction.transactionId,
+                        transactionHash: transaction.transactionHash,
+                        transactionStatus: transaction.transactionStatus,
+                        reference: transaction.reference,
+                        fromWalletAddress: transaction.fromWalletAddress,
+                        recipientAddress: transaction.recipientAddress,
+                        inputToken: transaction.inputToken,
+                        inputTokenAmount: transaction.inputTokenAmount,
+                    });
+
                     return { success: true };
                 }
             }

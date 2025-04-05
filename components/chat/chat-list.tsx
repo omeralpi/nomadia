@@ -41,7 +41,7 @@ export function ChatList() {
                             />
                             <div className="space-y-1">
                                 <div className="font-medium">
-                                    {conversation.participants[0]?.name}
+                                    {conversation.participants[0]?.name || 'Anonymous'}
                                 </div>
                                 {conversation.lastMessage && (
                                     <div className="truncate text-sm text-muted-foreground">

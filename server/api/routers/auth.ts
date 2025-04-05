@@ -9,7 +9,7 @@ export const authRouter = createTRPCRouter({
         .mutation(async ({ ctx, input }) => {
             const user = await db.update(users)
                 .set(input)
-                .where(eq(users.id, ctx.user.id))
+                .where(eq(users.address, ctx.user.address))
                 .returning()
 
             return user[0]

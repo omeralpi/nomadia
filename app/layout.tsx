@@ -1,5 +1,4 @@
-
-import { ErudaProvider } from "@/components/eruda";
+// import { ErudaProvider } from "@/components/eruda";
 import MiniKitProvider from "@/components/providers/minikit-provider";
 import NextAuthProvider from "@/components/providers/next-auth-provider";
 import { TRPCProvider } from "@/components/providers/trpc-provider";
@@ -39,11 +38,11 @@ export default function RootLayout({
         <div className="fixed top-[-150px] right-[-150px] w-[300px] h-[300px] rounded-full bg-primary/40 blur-[100px] pointer-events-none z-10" aria-hidden="true" />
         <NextAuthProvider>
           <TRPCProvider>
-            <ErudaProvider>
-              <MiniKitProvider>
-                {children}
-              </MiniKitProvider>
-            </ErudaProvider>
+            {/* <ErudaProvider> */}
+            <MiniKitProvider>
+              {children}
+            </MiniKitProvider>
+            {/* </ErudaProvider> */}
           </TRPCProvider>
         </NextAuthProvider>
         <Toaster />

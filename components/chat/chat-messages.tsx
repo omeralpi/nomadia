@@ -62,7 +62,6 @@ export function ChatMessages({ userId }: ChatMessagesProps) {
         return <ChatMessagesSkeleton />;
     }
 
-
     if (!data?.pages[0].items.length) {
         return (
             <EmptyState
@@ -74,7 +73,7 @@ export function ChatMessages({ userId }: ChatMessagesProps) {
     }
 
     return (
-        <div className="flex flex-col-reverse gap-4 p-4">
+        <div className="flex flex-col-reverse gap-4">
             <div ref={messagesEndRef} />
 
             {data?.pages.map((page, i) => (
@@ -92,7 +91,8 @@ export function ChatMessages({ userId }: ChatMessagesProps) {
                             >
                                 <div className={cn(
                                     "flex flex-col gap-2 max-w-[70%]",
-                                    isSender && "items-end"
+                                    isSender && "items-end",
+                                    !isSender && "items-start"
                                 )}>
                                     <div className="text-xs text-muted-foreground">
                                         {formatDistanceToNow(new Date(message.createdAt), { addSuffix: true })}

@@ -1,7 +1,6 @@
 import { verifySiweMessage } from '@worldcoin/minikit-js'
 import { eq } from 'drizzle-orm'
 import { NextAuthOptions, User } from 'next-auth'
-import { JWT } from 'next-auth/jwt'
 import Credentials from 'next-auth/providers/credentials'
 import { db } from '../db'
 import { users } from '../db/schema'
@@ -40,7 +39,7 @@ export const authOptions: NextAuthOptions = {
                 }
 
                 const user = await db.query.users.findFirst({
-                    where: eq(users.address, result.siweMessageData.address),
+                    where: eq(users.address, result.siweMessageData.address.toLowerCase()),
                 })
 
                 if (user) {
@@ -54,7 +53,7 @@ export const authOptions: NextAuthOptions = {
                 }
 
                 const [newUser] = await db.insert(users).values({
-                    address: result.siweMessageData.address,
+                    address: result.siweMessageData.address.toLowerCase(),
                 }).returning()
 
                 return {
@@ -68,49 +67,46 @@ export const authOptions: NextAuthOptions = {
         }),
     ],
     callbacks: {
-        async jwt({ token, user, trigger }) {
-            if (trigger === 'update') {
-                return await handleTokenUpdate(token)
-            }
-
+        async jwt({ token, user }) {
             if (user) {
-                return {
-                    ...token,
-                    userId: user.id,
-                    name: user.name,
-                    image: user.image,
-                    address: user.address,
-                }
-            }
+                const dbUser = await db.query.users.findFirst({
+                    where: eq(users.address, user.address.toLowerCase()),
+                })
 
+                if (!dbUser) {
+                    throw new Error('User not found in database')
+                }
+
+                token.id = dbUser.id
+                token.address = dbUser.address
+                token.name = dbUser.name
+                token.image = dbUser.image
+            }
             return token
         },
-        session: async ({ session, token }) => {
-            if (token.userId) {
-                session.user.id = token.userId as string
-                session.user.name = token.name as string
-                session.user.image = token.image as string
-                session.user.address = token.address as string
-            }
+        async session({ session, token }) {
+            if (token) {
+                const dbUser = await db.query.users.findFirst({
+                    where: eq(users.address, token.address as string),
+                })
 
+                if (!dbUser) {
+                    throw new Error('User not found in session')
+                }
+
+                session.user = {
+                    id: dbUser.id,
+                    address: dbUser.address,
+                    name: dbUser.name,
+                    image: dbUser.image,
+                    email: null
+                }
+            }
             return session
-        },
+        }
     },
     debug: process.env.NODE_ENV === "development",
-}
-
-async function handleTokenUpdate(token: JWT) {
-    const dbUser = await db.query.users.findFirst({
-        where: eq(users.address, token.address as string),
-    })
-
-    if (!dbUser) {
-        return token
-    }
-
-    return {
-        ...token,
-        name: dbUser.name,
-        image: dbUser.image,
+    pages: {
+        error: '/auth/error'
     }
 }

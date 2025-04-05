@@ -11,5 +11,6 @@ export const ErudaProvider = (props: { children: ReactNode }) => {
   if (process.env.NEXT_PUBLIC_APP_ENV === "production") {
     return props.children;
   }
+
   return <Eruda>{props.children}</Eruda>;
 };

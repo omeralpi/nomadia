@@ -1,33 +1,82 @@
-## This template provides a minimal setup to get Next.js working with MiniKit
+# Nomadia
+
+A peer-to-peer currency exchange Mini App built with MiniKit and World ID integration.
+
+## About
+
+Nomadia is a decentralized platform that enables users to exchange currency with others in their vicinity. The application facilitates secure peer-to-peer transactions through World ID verification and features an intuitive interface for managing listings and communications.
+
+## ⚙️ Tech Stack
+
+🔹 Next.js ⚡ (Frontend framework)
+
+🔹 PostgreSQL 🗄️ (Database)
+
+🔹 Drizzle ORM 🎯 (TypeScript ORM)
+
+🔹 Cloudinary ☁️ (Image storage)
+
+🔹 TailwindCSS 🎨 (Styling)
+
+🔹 Shadcn/UI 🎯 (UI Components)
+
+🔹 tRPC 🎯 (API layer)
+
+### World Technologies
+🌍 MiniKit (Mini App Development Kit)
+🌍 World ID (Identity Verification)
+🌍 World SDK (World App Integration)
 
 ## Setup
 
 ```bash
+# Copy .env.example to .env and set the environment variables
 cp .env.example .env
-pnpm i
-pnpm dev
 
+# Database setup
+docker compose up -d
+
+# Install dependencies
+pnpm install
+
+# Migrate database
+pnpm db:push
+
+# Start the development server
+pnpm dev
 ```
 
-To run as a mini app choose a production app in the dev portal and use NGROK to tunnel. Set the `NEXTAUTH_URL` and the redirect url if using sign in with worldcoin to that ngrok url
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-To use the application, you'll need to:
-
-1. **Get World ID Credentials**
-   From the [World ID Developer Portal](https://developer.worldcoin.org/):
-
-   - Create a new app to get your `APP_ID`
-   - Get `DEV_PORTAL_API_KEY` from the API Keys section
-   - Navigate to "Sign in with World ID" page to get:
-     - `WLD_CLIENT_ID`
-     - `WLD_CLIENT_SECRET`
-
-2. **Configure Action**
-   - In the Developer Portal, create an action in the "Incognito Actions" section
-   - Use the same action name in `components/Verify/index.tsx`
+To run as a mini app:
+1. Choose a production app in the dev portal
+2. Use NGROK to tunnel
+3. Set the `NEXTAUTH_URL` and the redirect URL for World ID sign-in to your ngrok URL
 
 View docs: [Docs](https://docs.world.org/)
 
 [Developer Portal](https://developer.worldcoin.org/)
+
+## Key Features
+
+1. **P2P Exchange**
+   - Browse active currency exchange listings
+   - Interactive map view for local transactions
+   - Slider navigation for easy browsing
+   - QR code functionality for transactions
+
+2. **My Listings**
+   - Manage your personal exchange listings
+   - Track active and completed transactions
+
+3. **Create Listing**
+   - Post new currency exchange offers
+   - Set exchange rates and preferences
+
+4. **Chat System**
+   - Direct messaging with potential exchange partners
+   - Conversation history tracking
+   - Real-time communication
+
+5. **Profile Management**
+   - Customize user profile
+   - Update avatar and personal information
+   - Manage account settings

@@ -4,7 +4,6 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/u
 import { api } from "@/lib/api";
 import { MiniKit, PayCommandInput, Tokens, tokenToDecimals } from "@worldcoin/minikit-js";
 import { IDetectedBarcode, Scanner } from "@yudiel/react-qr-scanner";
-import { Button } from "./ui/button";
 
 interface PayQrScannerDrawerProps {
     isOpen: boolean;
@@ -28,7 +27,7 @@ export const PayQrScannerDrawer = ({ isOpen, onOpenChange }: PayQrScannerDrawerP
                         token_amount: tokenToDecimals(amount, selectedToken).toString(),
                     },
                 ],
-                description: "P2P Transaction Completed",
+                description: "P2P Transaction",
             };
             if (MiniKit.isInstalled()) {
                 return await MiniKit.commandsAsync.pay(payload);
@@ -66,7 +65,7 @@ export const PayQrScannerDrawer = ({ isOpen, onOpenChange }: PayQrScannerDrawerP
             const res = await confirmPayment.mutateAsync({ payload: response });
 
             if (res.success) {
-                setStatus("P2P Transaction Successful");
+                setStatus("P2P Transaction");
             } else {
                 setStatus("Payment confirmation failed");
             }
@@ -101,13 +100,6 @@ export const PayQrScannerDrawer = ({ isOpen, onOpenChange }: PayQrScannerDrawerP
                             video: "rounded-xl"
                         }}
                     />
-                    <Button onClick={() => {
-                        handlePay('0x0c7c633b0ac9103ba7b153fb831c533afffb5a34', Tokens.WLD, 0.001, (status) => {
-                            console.log(status);
-                        });
-                    }}>
-                        Pay
-                    </Button>
                 </div>
             </DrawerContent>
         </Drawer>

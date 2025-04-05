@@ -1,12 +1,14 @@
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface BackButtonProps {
-    href: string;
+    href?: string;
+    className?: string;
 }
 
-export function BackButton({ href }: BackButtonProps) {
+export function BackButton({ href, className }: BackButtonProps) {
     const router = useRouter();
 
     return (
@@ -20,7 +22,10 @@ export function BackButton({ href }: BackButtonProps) {
                     router.back();
                 }
             }}
-            className="rounded-full"
+            className={cn(
+                "rounded-full",
+                className
+            )}
         >
             <ChevronLeft className="h-5 w-5" />
         </Button>

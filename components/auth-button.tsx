@@ -28,6 +28,8 @@ export const AuthButton = () => {
         }
 
         setIsPending(false)
+
+        router.refresh()
     }, [router])
 
     return (

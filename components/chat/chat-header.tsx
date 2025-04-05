@@ -19,11 +19,11 @@ export function ChatHeader() {
                     <div className="flex items-center gap-2">
                         <UserAvatar
                             src={user.image}
-                            fallback={user.name}
+                            fallback={user.name?.slice(0, 2)}
                             className="h-8 w-8"
                         />
                         <div className="flex-1">
-                            <div className="font-medium">{user.name}</div>
+                            <div className="font-medium">{user.name || 'Anonymous'}</div>
                         </div>
                     </div>
                 ) : (

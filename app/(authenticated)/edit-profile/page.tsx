@@ -51,7 +51,6 @@ export default function Page() {
                 <ProfileForm
                     defaultValues={{
                         name: session?.user?.name ?? "",
-                        bio: session?.user?.bio ?? "",
                         image: session?.user?.image ?? "",
                     }}
                     onSubmit={handleSubmit}

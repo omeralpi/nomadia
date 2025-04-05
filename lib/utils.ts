@@ -44,3 +44,17 @@ export function convertToLocalTime(utcDate: Date) {
 
     return formatDistanceToNow(localDate, { addSuffix: true });
 }
+
+export function formatWLDAmount(weiAmount: string | number | null) {
+    if (!weiAmount) return "0";
+
+    const amountInWei = typeof weiAmount === 'string' ? BigInt(weiAmount) : BigInt(weiAmount.toString());
+
+    const wldAmount = Number(amountInWei) / 1e18;
+
+    return new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 6,
+        useGrouping: true,
+    }).format(wldAmount);
+}

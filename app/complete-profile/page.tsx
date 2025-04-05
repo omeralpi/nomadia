@@ -34,7 +34,7 @@ export default function Page() {
         onSuccess: async () => {
             toast.success("Profile saved successfully");
 
-            update({ trigger: "update" })
+            await update({ trigger: "update" })
 
             router.push("/p2p");
         }

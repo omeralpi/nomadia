@@ -56,9 +56,11 @@ export function ChatList() {
                                     {formatDistanceToNow(new Date(conversation.lastMessage.createdAt), { addSuffix: true })}
                                 </div>
                             )}
-                            <div className="rounded-full size-5 bg-primary flex items-center justify-center text-[10px] text-background">
-                                2
-                            </div>
+                            {conversation.unreadCount > 0 && (
+                                <div className="rounded-full size-5 bg-primary flex items-center justify-center text-[10px] text-background">
+                                    {conversation.unreadCount}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </Link>

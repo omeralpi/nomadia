@@ -1,12 +1,13 @@
 "use client";
 
 import { ListingAvatar } from "@/components/listing-avatar";
+import { ListingTypeBadge } from "@/components/listing-type-badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { api } from "@/lib/api";
-import { calculateDistance, cn } from "@/lib/utils";
-import { GoogleMap, Marker, OverlayView, useLoadScript } from "@react-google-maps/api";
-import { MessageCircleIcon, Navigation } from "lucide-react";
+import { calculateDistance, cn, formatAmount } from "@/lib/utils";
+import { GoogleMap, OverlayView, useLoadScript } from "@react-google-maps/api";
+import { MessageCircleIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useRef, useState } from "react";
 import "swiper/css";
@@ -20,9 +21,10 @@ interface ListingMapProps {
         longitude: number;
     };
     showCurrentLocation?: boolean;
+    onMapLoad?: (map: google.maps.Map) => void;
 }
 
-export function ListingMap({ className, currentLocation, showCurrentLocation }: ListingMapProps) {
+export function ListingMap({ className, currentLocation, showCurrentLocation, onMapLoad }: ListingMapProps) {
     const { data: listings = [], isLoading } = api.listing.nearby.useQuery(
         {
             latitude: currentLocation?.latitude ?? 0,
@@ -206,42 +208,36 @@ export function ListingMap({ className, currentLocation, showCurrentLocation }: 
                 zoom={currentLocation ? 14 : 2}
                 center={mapCenter}
                 options={options}
-                onLoad={map => setMapRef(map)}
+                onLoad={map => {
+                    setMapRef(map);
+                    onMapLoad?.(map);
+                }}
             >
-                <div className="absolute right-4 top-4">
-                    <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-10 w-10 rounded-full bg-background shadow-md"
-                        onClick={() => {
-                            if (currentLocation && mapRef) {
-                                mapRef.panTo({
-                                    lat: currentLocation.latitude,
-                                    lng: currentLocation.longitude
-                                });
-                                mapRef.setZoom(15);
-                            }
-                        }}
-                    >
-                        <Navigation className="h-5 w-5" />
-                    </Button>
-                </div>
-
                 {showCurrentLocation && currentLocation && (
-                    <Marker
-                        position={{
-                            lat: currentLocation.latitude,
-                            lng: currentLocation.longitude,
-                        }}
-                        icon={{
-                            path: google.maps.SymbolPath.CIRCLE,
-                            scale: 8,
-                            fillColor: "#3B82F6",
-                            fillOpacity: 1,
-                            strokeColor: "#FFFFFF",
-                            strokeWeight: 2,
-                        }}
-                    />
+                    <>
+                        <OverlayView
+                            position={{
+                                lat: currentLocation.latitude,
+                                lng: currentLocation.longitude,
+                            }}
+                            mapPaneName={OverlayView.FLOAT_PANE}
+                        >
+                            <div className="relative -translate-x-1/2 -translate-y-1/2">
+                                <div className="absolute -inset-6">
+                                    <div className="h-12 w-12 rounded-full bg-primary/30 animate-[ping_1.5s_cubic-bezier(0,0,0.2,1)_infinite]" />
+                                </div>
+                                <div className="absolute -inset-10">
+                                    <div className="h-20 w-20 rounded-full bg-primary/20 animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite]" />
+                                </div>
+                                <div className="absolute -inset-14">
+                                    <div className="h-28 w-28 rounded-full bg-primary/10 animate-[pulse_3s_cubic-bezier(0.4,0,0.6,1)_infinite]" />
+                                </div>
+                                <div className="absolute -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2">
+                                    <div className="h-8 w-8 rounded-full bg-primary border-[3px] border-white shadow-lg" />
+                                </div>
+                            </div>
+                        </OverlayView>
+                    </>
                 )}
                 {sortedListings.map((listing) => (
                     <OverlayView
@@ -250,17 +246,25 @@ export function ListingMap({ className, currentLocation, showCurrentLocation }: 
                         mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
                     >
                         <div
-                            className="relative -translate-x-1/2 -translate-y-1/2 cursor-pointer"
+                            className="relative -translate-x-1/2 -translate-y-1/2 cursor-pointer group"
                             onClick={() => handleListingClick(listing.id)}
                         >
                             <div className="flex flex-col items-center">
                                 <div className="relative">
+                                    <div className="flex justify-center">
+                                        <ListingTypeBadge type={listing.type} />
+                                    </div>
                                     <ListingAvatar
                                         listing={listing}
                                         selected={selectedListingId === listing.id}
                                     />
                                     <div className="absolute -bottom-1 left-1/2 -translate-x-1/2">
-                                        <div className="h-2 w-2 rounded-full bg-primary shadow" />
+                                        <div className={cn(
+                                            "h-2 w-2 rounded-full shadow",
+                                            listing.type === "buying"
+                                                ? "bg-blue-500"
+                                                : "bg-green-500"
+                                        )} />
                                     </div>
                                 </div>
                             </div>
@@ -302,7 +306,7 @@ export function ListingMap({ className, currentLocation, showCurrentLocation }: 
                                                     <ListingAvatar
                                                         listing={listing}
                                                     />
-                                                    <div className="flex-1">
+                                                    <div className="flex-1 space-y-1">
                                                         <div className="flex items-center justify-between">
                                                             <div className="font-medium">{listing.user.name}</div>
                                                             {distance && (
@@ -311,8 +315,11 @@ export function ListingMap({ className, currentLocation, showCurrentLocation }: 
                                                                 </div>
                                                             )}
                                                         </div>
-                                                        <div className="text-sm text-muted-foreground">
-                                                            {listing.type === "buying" ? "Buying" : "Selling"} {listing.amount} {listing.currencyCode}
+                                                        <div className="flex items-center gap-2">
+                                                            <ListingTypeBadge type={listing.type} />
+                                                            <span className="text-muted-foreground text-sm font-medium font-display">
+                                                                {formatAmount(listing.amount)} {listing.currencyCode}
+                                                            </span>
                                                         </div>
                                                     </div>
                                                 </div>

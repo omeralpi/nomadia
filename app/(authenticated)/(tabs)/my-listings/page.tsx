@@ -5,6 +5,7 @@ import { CreateListingDrawer } from "@/components/create-listing-drawer";
 import { DefaultLayout } from "@/components/default-layout";
 import { EditListingDrawer } from "@/components/edit-listing-drawer";
 import { ListingAvatar } from "@/components/listing-avatar";
+import { ListingTypeBadge } from "@/components/listing-type-badge";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -81,17 +82,15 @@ export default function Page() {
                                 <ListingAvatar
                                     listing={listing}
                                 />
-                                <div className="flex-1">
+                                <div className="flex-1 space-y-1">
                                     <div className="flex items-center gap-2">
-                                        <div className="font-medium text-sm text-muted-foreground">
-                                            {listing.type === "buying" ? "Buying" : "Selling"}
-                                        </div>
+                                        <ListingTypeBadge type={listing.type} />
                                         <div className="size-1 rounded-full bg-muted-foreground/50" />
                                         <div className="text-xs text-muted-foreground">
                                             {new Date(listing.createdAt).toLocaleDateString()}
                                         </div>
                                     </div>
-                                    <div className="text-xl font-semibold mt-1 font-display">
+                                    <div className="text-xl text-muted-foreground font-semibold font-display">
                                         {formatAmount(listing.amount)} {listing.currencyCode}
                                     </div>
                                 </div>

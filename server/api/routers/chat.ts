@@ -1,5 +1,6 @@
 import { conversationParticipants, conversations, messages } from "@/lib/db/schema/chat";
-import { and, asc, desc, eq, exists } from "drizzle-orm";
+import { users } from "@/lib/db/schema/user";
+import { and, asc, desc, eq, exists, not } from "drizzle-orm";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
@@ -24,36 +25,67 @@ export const chatRouter = createTRPCRouter({
     }),
 
     getConversations: protectedProcedure.query(async ({ ctx }) => {
-        const userConversations = await ctx.db.query.conversations.findMany({
-            where: exists(
-                ctx.db.select()
-                    .from(conversationParticipants)
-                    .where(and(
-                        eq(conversationParticipants.conversationId, conversations.id),
-                        eq(conversationParticipants.userId, ctx.session.user.id)
-                    ))
-            ),
-            with: {
-                participants: {
-                    with: {
-                        user: true,
-                    },
-                },
-                messages: {
-                    limit: 1,
-                    orderBy: [desc(messages.createdAt)],
-                },
-            },
-            orderBy: [desc(conversations.updatedAt)],
-        });
+        const baseQuery = ctx.db
+            .select({
+                id: conversations.id,
+                createdAt: conversations.createdAt,
+                updatedAt: conversations.updatedAt,
+            })
+            .from(conversations)
+            .innerJoin(
+                conversationParticipants,
+                and(
+                    eq(conversations.id, conversationParticipants.conversationId),
+                    eq(conversationParticipants.userId, ctx.session.user.id)
+                )
+            )
+            .orderBy(desc(conversations.updatedAt));
 
-        return userConversations.map(conv => ({
-            ...conv,
-            participants: conv.participants
-                .filter(p => p.userId !== ctx.session.user.id)
-                .map(p => p.user),
-            lastMessage: conv.messages[0],
+        const results = await Promise.all((await baseQuery).map(async (conv) => {
+            const participants = await ctx.db
+                .select({
+                    userId: conversationParticipants.userId,
+                    user: {
+                        id: users.id,
+                        name: users.name,
+                        image: users.image,
+                    }
+                })
+                .from(conversationParticipants)
+                .innerJoin(users, eq(users.id, conversationParticipants.userId))
+                .where(eq(conversationParticipants.conversationId, conv.id));
+
+            const unreadMessages = await ctx.db
+                .select({ id: messages.id })
+                .from(messages)
+                .where(and(
+                    eq(messages.conversationId, conv.id),
+                    eq(messages.isRead, false),
+                    not(eq(messages.senderId, ctx.session.user.id))
+                ));
+
+            const lastMessage = await ctx.db
+                .select({
+                    id: messages.id,
+                    content: messages.content,
+                    createdAt: messages.createdAt,
+                    senderId: messages.senderId,
+                    isRead: messages.isRead
+                })
+                .from(messages)
+                .where(eq(messages.conversationId, conv.id))
+                .orderBy(desc(messages.createdAt))
+                .limit(1);
+
+            return {
+                ...conv,
+                participants: participants.filter(p => p.userId !== ctx.session.user.id).map(p => p.user),
+                lastMessage: lastMessage[0],
+                unreadCount: unreadMessages.length
+            };
         }));
+
+        return results;
     }),
 
     getMessages: protectedProcedure
@@ -225,5 +257,47 @@ export const chatRouter = createTRPCRouter({
             ]);
 
             return conversation;
+        }),
+
+    markMessagesAsRead: protectedProcedure
+        .input(z.object({
+            userId: z.string(),
+        }))
+        .mutation(async ({ ctx, input }) => {
+            const { userId } = input;
+
+            const conversation = await ctx.db.select()
+                .from(conversations)
+                .innerJoin(conversationParticipants, eq(conversations.id, conversationParticipants.conversationId))
+                .where(
+                    and(
+                        eq(conversationParticipants.userId, ctx.session.user.id),
+                        exists(
+                            ctx.db.select()
+                                .from(conversationParticipants)
+                                .where(
+                                    and(
+                                        eq(conversationParticipants.conversationId, conversations.id),
+                                        eq(conversationParticipants.userId, userId)
+                                    )
+                                )
+                        )
+                    )
+                )
+                .limit(1);
+
+            if (!conversation.length) {
+                return;
+            }
+
+            await ctx.db.update(messages)
+                .set({ isRead: true })
+                .where(
+                    and(
+                        eq(messages.conversationId, conversation[0].conversations.id),
+                        eq(messages.senderId, userId),
+                        eq(messages.isRead, false)
+                    )
+                );
         }),
 }); 

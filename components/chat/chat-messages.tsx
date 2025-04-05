@@ -20,6 +20,7 @@ export function ChatMessages({ userId }: ChatMessagesProps) {
     const { data: session } = useSession();
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const { ref, inView } = useInView();
+    const utils = api.useUtils();
 
     const {
         data,
@@ -36,6 +37,16 @@ export function ChatMessages({ userId }: ChatMessagesProps) {
             getNextPageParam: (lastPage) => lastPage.nextCursor,
         }
     );
+
+    const { mutate: markAsRead } = api.chat.markMessagesAsRead.useMutation({
+        onSuccess: () => {
+            utils.chat.getConversations.invalidate();
+        },
+    });
+
+    useEffect(() => {
+        markAsRead({ userId });
+    }, [userId, markAsRead]);
 
     useEffect(() => {
         if (inView && hasNextPage && !isFetchingNextPage) {

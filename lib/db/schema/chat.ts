@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { index, pgTable, primaryKey, serial, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, index, pgTable, primaryKey, serial, text, timestamp } from "drizzle-orm/pg-core";
 import { users } from "./user";
 
 export const conversations = pgTable("conversations", {
@@ -20,6 +20,7 @@ export const messages = pgTable("messages", {
     content: text("content").notNull(),
     conversationId: serial("conversation_id").references(() => conversations.id, { onDelete: "cascade" }).notNull(),
     senderId: text("sender_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+    isRead: boolean("is_read").default(false).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
 }, (table) => ({

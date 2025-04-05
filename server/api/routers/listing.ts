@@ -11,9 +11,9 @@ export const listingRouter = createTRPCRouter({
             latitude: z.number(),
             longitude: z.number(),
             type: z.enum(["buying", "selling"]).optional(),
-            currency: z.enum(["TWD", "USD", "EUR", "USDC"]).optional(),
+            currency: z.string().optional(),
         }))
-        .query(async ({ ctx, input }) => {
+        .query(async ({ input }) => {
             const listingsList = await db.query.listings.findMany({
                 where: and(
                     eq(listings.status, "active"),

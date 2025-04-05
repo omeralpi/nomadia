@@ -36,7 +36,7 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
       </head>
       <body className={cn(inter.className, spaceGrotesk.variable, "antialiased dark relative")}>
-        <div className="fixed top-[-150px] right-[-150px] w-[300px] h-[300px] rounded-full bg-primary/30 blur-[100px] pointer-events-none z-10" aria-hidden="true" />
+        <div className="fixed top-[-150px] right-[-150px] w-[300px] h-[300px] rounded-full bg-primary/40 blur-[100px] pointer-events-none z-10" aria-hidden="true" />
         <NextAuthProvider>
           <TRPCProvider>
             <ErudaProvider>

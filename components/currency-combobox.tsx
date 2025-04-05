@@ -36,7 +36,7 @@ export function CurrencyCombobox({ value, onValueChange }: CurrencyComboboxProps
         : currencies;
 
     return (
-        <div className="space-y-2">
+        <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
                 <Button
                     type="button"

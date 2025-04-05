@@ -1,9 +1,9 @@
 'use client';
 
 import { ListingMap } from "@/components/listing-map";
+import { SearchForm } from "@/components/search-form";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { RiMapPin2Line, RiSearchLine } from "@remixicon/react";
+import { RiMapPin2Line, RiQrCodeLine } from "@remixicon/react";
 import { useEffect, useState } from "react";
 
 export default function Page() {
@@ -11,6 +11,7 @@ export default function Page() {
         latitude: number;
         longitude: number;
     }>();
+    const [mapRef, setMapRef] = useState<google.maps.Map | null>(null);
 
     useEffect(() => {
         if (navigator.geolocation) {
@@ -34,26 +35,37 @@ export default function Page() {
                 className="fixed inset-0"
                 currentLocation={location}
                 showCurrentLocation={true}
+                onMapLoad={setMapRef}
             />
-            <div className="absolute inset-x-0 top-0 z-10 px-4 py-4 rounded-b-3xl">
-                <div className="relative">
-                    <RiSearchLine className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground size-[16px z-10" />
-                    <Input className="pl-12 bg-muted/50 backdrop-blur rounded-3xl" placeholder="Search location" />
-                    <Button
-                        size='icon'
-                        className="rounded-full absolute right-3 top-1/2 -translate-y-1/2"
-                        onClick={() => {
-                            if (location) {
-                                setLocation({
-                                    latitude: location.latitude,
-                                    longitude: location.longitude
-                                });
-                            }
-                        }}
-                    >
-                        <RiMapPin2Line className="size-[16px]" />
-                    </Button>
+            <div className="absolute inset-x-0 top-0 z-10 px-4 py-4 rounded-b-3xl flex gap-4 items-center">
+                <div className="relative flex-1">
+                    <SearchForm
+                        placeholder="Search location"
+                    />
+                    <div className="absolute top-0 right-0 h-full flex justify-center items-center px-3">
+                        <Button
+                            size='icon'
+                            className="rounded-full"
+                            onClick={() => {
+                                if (location && mapRef) {
+                                    mapRef.panTo({
+                                        lat: location.latitude,
+                                        lng: location.longitude
+                                    });
+                                    mapRef.setZoom(15);
+                                }
+                            }}
+                        >
+                            <RiMapPin2Line className="size-[16px]" />
+                        </Button>
+                    </div>
                 </div>
+                <Button
+                    size="icon"
+                    className="rounded-full [&_svg]:size-8 size-14"
+                >
+                    <RiQrCodeLine />
+                </Button>
             </div>
         </>
     );

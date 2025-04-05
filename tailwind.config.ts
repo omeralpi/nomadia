@@ -73,13 +73,17 @@ const config: Config = {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				yellow: {
-					400: "#e5fa5d",
+					400: "#34d399",
 					600: "#ffdd5b"
 				},
 				gray: {
 					900: "#222222",
 					800: "#232323",
-				}
+				},
+				green: {
+					400: "#00d492",
+					600: "#7ab361"
+				},
 			},
 			keyframes: {
 				'accordion-down': {

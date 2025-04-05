@@ -328,7 +328,11 @@ export function ListingMap({ className, currentLocation, showCurrentLocation, on
                                                     onClick={(e) => {
                                                         e.stopPropagation();
 
-                                                        router.push(`/chat/${listing.user.id}?userName=${listing.user.name}&userImage=${listing.user.image}`);
+                                                        const defaultMessage = listing.type === "buying"
+                                                            ? `Hey, I'm interested in selling ${listing.amount} ${listing.currencyCode}`
+                                                            : `Hey, I'm interested in buying ${listing.amount} ${listing.currencyCode}`;
+
+                                                        router.push(`/chat/${listing.user.id}?userName=${listing.user.name}&userImage=${listing.user.image}&initialMessage=${encodeURIComponent(defaultMessage)}`);
                                                     }}
                                                 >
                                                     Send Message

@@ -3,17 +3,29 @@
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/api";
 import { RiSendPlane2Fill } from "@remixicon/react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "../ui/button";
 
 interface ChatInputProps {
     userId: string;
+    initialMessage?: string | null;
 }
 
-export function ChatInput({ userId }: ChatInputProps) {
+export function ChatInput({ userId, initialMessage }: ChatInputProps) {
     const [content, setContent] = useState("");
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const utils = api.useUtils();
+    const initialMessageSet = useRef(false);
+
+    useEffect(() => {
+        if (initialMessage && !initialMessageSet.current) {
+            setContent(initialMessage);
+            initialMessageSet.current = true;
+            if (textareaRef.current) {
+                textareaRef.current.focus();
+            }
+        }
+    }, [initialMessage]);
 
     const { mutate: sendMessage, isPending } = api.chat.sendMessage.useMutation({
         onSuccess: () => {
@@ -52,7 +64,7 @@ export function ChatInput({ userId }: ChatInputProps) {
                         adjustTextareaHeight();
                     }}
                     placeholder="Type a message..."
-                    className="rounded-3xl bg-muted min-h-[34px] max-h-[150px] resize-none"
+                    className="rounded-3xl bg-muted min-h-[34px] pr-16 max-h-[150px] resize-none"
                     disabled={isPending}
                 />
                 <div className="flex absolute top-0 right-0 bottom-0 px-4 items-center">

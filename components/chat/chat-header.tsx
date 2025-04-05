@@ -1,41 +1,48 @@
-import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/components/user-avatar";
-import { ChevronLeft } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
+import { api } from "@/lib/api";
+import { useParams } from "next/navigation";
+import { BackButton } from "../back-button";
 
-interface ChatHeaderProps {
-    name: string;
-    image?: string | null;
-    status?: string;
-}
+export function ChatHeader() {
+    const params = useParams();
+    const userId = params.userId as string;
 
-export function ChatHeader({ name, image, status }: ChatHeaderProps) {
-    const router = useRouter();
-    const pathname = usePathname();
+    const { data: user, isLoading: isLoadingUser, isSuccess: isSuccessUser } = api.user.getById.useQuery({ id: userId });
 
     return (
         <div className="flex items-center gap-4 border-b bg-background p-4">
-            <Button
-                variant="outline"
-                size="icon"
-                onClick={() => router.push("/chat")}
-                className="rounded-full"
-            >
-                <ChevronLeft className="h-5 w-5" />
-            </Button>
-            <UserAvatar
-                src={image}
-                fallback={name[0]}
-                className="h-8 w-8"
-            />
-            <div className="flex-1">
-                <div className="font-medium">{name}</div>
-                {status && (
-                    <div className="text-xs text-muted-foreground">
-                        {status}
+            <BackButton href="/chat" />
+            {
+                isLoadingUser ? (
+                    <ChatHeaderSkeleton />
+                ) : isSuccessUser ? (
+                    <div className="flex items-center gap-2">
+                        <UserAvatar
+                            src={user.image}
+                            fallback={user.name}
+                            className="h-8 w-8"
+                        />
+                        <div className="flex-1">
+                            <div className="font-medium">{user.name}</div>
+                        </div>
                     </div>
-                )}
+                ) : (
+                    <div className="flex-1">
+                        <div className="h-4 w-24 animate-pulse rounded-full bg-gray-200" />
+                    </div>
+                )
+            }
+        </div>
+    );
+}
+
+export function ChatHeaderSkeleton() {
+    return (
+        <div className="flex items-center gap-4">
+            <div className="h-8 w-8 animate-pulse rounded-full bg-gray-200" />
+            <div className="flex-1">
+                <div className="h-4 w-24 animate-pulse rounded-full bg-gray-200" />
             </div>
         </div>
     );
-} 
+}

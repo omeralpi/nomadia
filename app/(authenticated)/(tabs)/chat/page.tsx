@@ -1,13 +1,14 @@
 import { ChatList } from "@/components/chat/chat-list";
+import { DefaultLayout } from "@/components/default-layout";
 import { PageHeader } from "@/components/page-header";
 import { SearchForm } from "@/components/search-form";
 
 export default function Page() {
     return (
-        <div className="container max-w-2xl mx-auto p-4 pb-20 space-y-6">
+        <DefaultLayout>
             <PageHeader title="Messages" />
             <SearchForm placeholder="Search messages" />
             <ChatList />
-        </div>
+        </DefaultLayout>
     );
 }

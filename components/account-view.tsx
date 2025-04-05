@@ -1,11 +1,12 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { RiLogoutCircleLine, RiSettings2Line } from "@remixicon/react";
+import { RiHistoryLine, RiLogoutCircleLine, RiSettings2Line } from "@remixicon/react";
 import { ChevronRight } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
+import { DefaultLayout } from "./default-layout";
 import { PageHeader } from "./page-header";
 
 export function AccountView() {
@@ -18,6 +19,11 @@ export function AccountView() {
             icon: RiSettings2Line
         },
         {
+            label: "Transaction History",
+            href: "/transaction-history",
+            icon: RiHistoryLine
+        },
+        {
             label: "Sign Out",
             href: "/sign-out",
             icon: RiLogoutCircleLine
@@ -25,10 +31,9 @@ export function AccountView() {
     ]
 
     return (
-        <div className="container mx-auto">
+        <DefaultLayout>
+            <PageHeader title="Account" />
             <div className="space-y-8">
-                <PageHeader title="Account" />
-
                 <Link href="/edit-profile" className="flex items-center gap-4">
                     <Avatar className="size-12">
                         <AvatarImage src={session?.user?.image ?? ""} />
@@ -70,6 +75,6 @@ export function AccountView() {
                 />
                 <span className="text-sm text-muted-foreground">Version 1.0.0</span>
             </div>
-        </div >
+        </DefaultLayout>
     );
 } 

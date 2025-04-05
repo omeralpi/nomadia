@@ -106,7 +106,11 @@ export const ReceivePaymentDrawer = ({ isOpen, onOpenChange }: ReceivePaymentDra
                                                                 inputMode="decimal"
                                                                 placeholder="Enter amount"
                                                                 {...field}
-                                                                onChange={(e) => field.onChange(Number(e.target.value))}
+                                                                onChange={(e) => {
+                                                                    const value = e.target.value.replace(',', '.');
+                                                                    const numberValue = parseFloat(value);
+                                                                    field.onChange(isNaN(numberValue) ? 0 : numberValue);
+                                                                }}
                                                                 className="w-full"
                                                             />
                                                         </FormControl>

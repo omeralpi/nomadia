@@ -3,7 +3,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { RiHistoryLine, RiLogoutCircleLine, RiSettings2Line } from "@remixicon/react";
 import { ChevronRight } from "lucide-react";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { DefaultLayout } from "./default-layout";
@@ -25,7 +25,9 @@ export function AccountView() {
         },
         {
             label: "Sign Out",
-            href: "/sign-out",
+            onClick: () => {
+                signOut();
+            },
             icon: RiLogoutCircleLine
         }
     ]
@@ -56,12 +58,23 @@ export function AccountView() {
                         Preferences
                     </div>
                     {
-                        menu.map((item) => (
-                            <Link href={item.href} key={item.label} className="font-semibold text-lg flex items-center gap-4">
-                                <item.icon className="size-6 text-muted-foreground/50" />
-                                {item.label}
-                            </Link>
-                        ))
+                        menu.map((item) => {
+                            if (item.onClick) {
+                                return (
+                                    <div onClick={item.onClick} key={item.label} className="font-semibold text-lg flex items-center gap-4">
+                                        <item.icon className="size-6 text-muted-foreground/50" />
+                                        {item.label}
+                                    </div>
+                                )
+                            }
+
+                            return (
+                                <Link href={item.href} key={item.label} className="font-semibold text-lg flex items-center gap-4">
+                                    <item.icon className="size-6 text-muted-foreground/50" />
+                                    {item.label}
+                                </Link>
+                            )
+                        })
                     }
                 </div>
             </div>

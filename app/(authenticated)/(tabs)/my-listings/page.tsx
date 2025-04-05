@@ -4,6 +4,7 @@ import { BasicAlertDialog } from "@/components/basic-alert-dialog";
 import { CreateListingDrawer } from "@/components/create-listing-drawer";
 import { DefaultLayout } from "@/components/default-layout";
 import { EditListingDrawer } from "@/components/edit-listing-drawer";
+import { EmptyState } from "@/components/empty-state";
 import { ListingAvatar } from "@/components/listing-avatar";
 import { ListingTypeBadge } from "@/components/listing-type-badge";
 import { PageHeader } from "@/components/page-header";
@@ -13,7 +14,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/lib/api";
 import { formatAmount } from "@/lib/utils";
-import { RiAddLine, RiDeleteBinLine, RiEditLine, RiMoreLine } from "@remixicon/react";
+import { RiAddLine, RiDeleteBinLine, RiEditLine, RiFileListLine, RiMoreLine } from "@remixicon/react";
 import { toast } from "sonner";
 
 function ListingsSkeleton() {
@@ -72,7 +73,7 @@ export default function Page() {
 
             {isLoading ? (
                 <ListingsSkeleton />
-            ) : (
+            ) : listings.length > 0 ? (
                 <div className="space-y-6">
                     {listings.map((listing) => (
                         <Card
@@ -135,6 +136,17 @@ export default function Page() {
                         </Card>
                     ))}
                 </div>
+            ) : (
+                <EmptyState
+                    icon={<RiFileListLine className="h-8 w-8" />}
+                    title="No listings found"
+                    description="Create a listing to get started"
+                    action={
+                        <CreateListingDrawer>
+                            <Button>Create listing</Button>
+                        </CreateListingDrawer>
+                    }
+                />
             )}
         </DefaultLayout>
     );

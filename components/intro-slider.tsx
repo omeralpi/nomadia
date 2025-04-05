@@ -1,6 +1,5 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
 import {
     Carousel,
     CarouselContent,
@@ -9,10 +8,9 @@ import {
     CarouselPrevious,
     type CarouselApi,
 } from "@/components/ui/carousel"
-import { signIn } from "next-auth/react"
 import Image from "next/image"
-import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+import { AuthButton } from "./auth-button"
 
 const slides = [
     {
@@ -40,7 +38,6 @@ const slides = [
 export function IntroSlider() {
     const [currentSlide, setCurrentSlide] = useState(0)
     const [api, setApi] = useState<CarouselApi>()
-    const router = useRouter()
 
     const isLastSlide = currentSlide === slides.length - 1
 
@@ -94,12 +91,7 @@ export function IntroSlider() {
 
             <div className="absolute bottom-0 space-y-6 left-0 right-0 flex flex-col items-center gap-4">
                 {isLastSlide && (
-                    <Button
-                        className="w-[200px] animate-in fade-in-50 duration-500"
-                        onClick={() => signIn("worldcoin")}
-                    >
-                        Start Trading
-                    </Button>
+                    <AuthButton />
                 )}
                 <div className="flex gap-2">
                     {slides.map((_, index) => (

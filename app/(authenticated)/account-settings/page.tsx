@@ -8,7 +8,7 @@ import { toast } from "sonner";
 
 export default function Page() {
     const router = useRouter();
-    const { data: session, update } = useSession();
+    const { data: session } = useSession();
 
     const truncateAddress = (address: string) => {
         if (!address) return "";
@@ -16,8 +16,8 @@ export default function Page() {
     };
 
     const copyToClipboard = async () => {
-        if (!session?.user?.id) return;
-        await navigator.clipboard.writeText(session.user.id);
+        if (!session?.user.address) return;
+        await navigator.clipboard.writeText(session.user.address);
         toast.success("Address copied to clipboard");
     };
 
@@ -49,7 +49,7 @@ export default function Page() {
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="text-muted-foreground">
-                                {truncateAddress(session?.user?.id || "")}
+                                {truncateAddress(session?.user.address || "")}
                             </div>
                             <Button
                                 variant="ghost"

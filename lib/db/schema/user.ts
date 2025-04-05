@@ -7,9 +7,9 @@ export const users = pgTable("users", {
     .notNull()
     .primaryKey()
     .$defaultFn(() => nanoid()),
+  address: text("address").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   name: text("name"),
-  bio: text("bio"),
   image: text("image"),
 })
 
@@ -19,6 +19,5 @@ export const createUserSchema = createInsertSchema(users)
 
 export const updateUserSchema = createInsertSchema(users).pick({
   name: true,
-  bio: true,
   image: true,
 })

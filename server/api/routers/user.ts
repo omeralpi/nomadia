@@ -1,5 +1,5 @@
 import { db } from "@/lib/db"
-import { users } from "@/lib/db/schema"
+import { transactions, users } from "@/lib/db/schema"
 import { TRPCError } from "@trpc/server"
 import { eq, sql } from "drizzle-orm"
 import { z } from "zod"
@@ -53,6 +53,20 @@ export const userRouter = createTRPCRouter({
       return {
         items,
         nextCursor,
+      };
+    }),
+
+  getTransactionCount: protectedProcedure
+    .input(z.object({
+      userId: z.string(),
+    }))
+    .query(async ({ input }) => {
+      const transactionCount = await db.query.transactions.findMany({
+        where: eq(transactions.fromWalletAddress, input.userId),
+      });
+
+      return {
+        count: transactionCount.length,
       };
     }),
 })

@@ -54,12 +54,6 @@ export default function Page() {
 
     return (
         <>
-            <ListingMap
-                className="fixed inset-0"
-                currentLocation={location}
-                showCurrentLocation={true}
-                onMapLoad={setMapRef}
-            />
             <div className="absolute inset-x-0 top-0 z-10 px-4 py-4 rounded-b-3xl flex gap-4 items-center">
                 <div className="relative flex-1">
                     <CitySearch onCitySelect={handleCitySelect} />
@@ -90,6 +84,13 @@ export default function Page() {
                     </Button>
                 </QrDrawer>
             </div>
+
+            <ListingMap
+                className="fixed inset-0"
+                currentLocation={location}
+                showCurrentLocation={true}
+                onMapLoad={setMapRef}
+            />
         </>
     );
 }

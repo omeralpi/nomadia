@@ -4,10 +4,15 @@ import { ListingAvatar } from "@/components/listing-avatar";
 import { ListingTypeBadge } from "@/components/listing-type-badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover";
 import { api } from "@/lib/api";
 import { calculateDistance, cn, formatAmount } from "@/lib/utils";
 import { GoogleMap, OverlayView, useLoadScript } from "@react-google-maps/api";
-import { MessageCircleIcon } from "lucide-react";
+import { BadgeCheckIcon, MessageCircleIcon, StarIcon } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useRef, useState } from "react";
@@ -204,7 +209,7 @@ export function ListingMap({ className, currentLocation, showCurrentLocation, on
     if (!isLoaded || isLoading) return <div></div>;
 
     return (
-        <div className={cn("relative h-full", className)}>
+        <div className={cn("relative h-full bg-background", className)}>
             <GoogleMap
                 mapContainerStyle={{ width: "100%", height: "100%" }}
                 zoom={currentLocation ? 14 : 2}
@@ -312,11 +317,33 @@ export function ListingMap({ className, currentLocation, showCurrentLocation, on
                                                     <div className="flex-1 space-y-1">
                                                         <div className="flex items-center justify-between">
                                                             <div className="font-medium">{listing.user.name || "Anonymous"}</div>
-                                                            {distance && (
-                                                                <div className="text-xs text-muted-foreground">
-                                                                    {formatDistance(distance)}
-                                                                </div>
-                                                            )}
+                                                            <div className="flex items-center gap-2">
+                                                                {listing.user.id && (
+                                                                    <Popover>
+                                                                        <PopoverTrigger asChild>
+                                                                            <Button
+                                                                                size="icon"
+                                                                                variant="ghost"
+                                                                                className="relative group"
+                                                                            >
+                                                                                <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/50 to-primary-foreground/50 rounded-full blur opacity-50 group-hover:opacity-75 transition animate-pulse" />
+                                                                                <div className="relative bg-background rounded-full p-1">
+                                                                                    <StarIcon className="h-4 w-4 text-primary animate-spin-slow" />
+                                                                                </div>
+                                                                                <span className="sr-only">View reputation</span>
+                                                                            </Button>
+                                                                        </PopoverTrigger>
+                                                                        <PopoverContent className="w-64 p-0">
+                                                                            <TransactionCount userId={listing.user.id} />
+                                                                        </PopoverContent>
+                                                                    </Popover>
+                                                                )}
+                                                                {distance && (
+                                                                    <div className="text-xs text-muted-foreground">
+                                                                        {formatDistance(distance)}
+                                                                    </div>
+                                                                )}
+                                                            </div>
                                                         </div>
                                                         <div className="flex items-center gap-2">
                                                             <ListingTypeBadge type={listing.type} />
@@ -352,5 +379,44 @@ export function ListingMap({ className, currentLocation, showCurrentLocation, on
                 </div>
             </div>
         </div >
+    );
+}
+
+function TransactionCount({ userId }: { userId: string }) {
+    const { data: transactionCount } = api.user.getTransactionCount.useQuery({ userId });
+    const count = transactionCount?.count ?? 0;
+
+    return (
+        <div className="relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-primary-foreground/10" />
+            <div className="relative p-4 space-y-4">
+                <div className="flex items-center justify-between">
+                    <h4 className="font-semibold text-sm">User Reputation</h4>
+                    <BadgeCheckIcon className="h-5 w-5 text-primary animate-pulse" />
+                </div>
+                <div className="flex flex-col items-center gap-2">
+                    <div className="relative">
+                        <div className="absolute inset-0 bg-gradient-to-r from-primary/50 to-primary-foreground/50 blur-xl animate-pulse" />
+                        <div className="relative text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-foreground">
+                            {count}
+                        </div>
+                    </div>
+                    <div className="text-sm text-center text-muted-foreground font-medium">
+                        Successful Transactions
+                    </div>
+                    <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                        <div
+                            className="h-full bg-gradient-to-r from-primary to-primary-foreground animate-pulse"
+                            style={{
+                                width: `${Math.min(100, (count / 10) * 100)}%`
+                            }}
+                        />
+                    </div>
+                    <div className="text-xs text-center text-muted-foreground">
+                        {count >= 10 ? "Trusted User" : `${10 - count} more to become trusted`}
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 } 
